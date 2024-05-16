@@ -7,6 +7,7 @@ import 'package:fluttercourse/pages/roadSideAssistance.dart';
 import 'package:fluttercourse/util/dimensions.dart';
 import 'package:fluttercourse/widgets/dawer.dart';
 import 'package:fluttercourse/pages/maintenance.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CommerceHome extends StatefulWidget {
   const CommerceHome({super.key});
@@ -53,12 +54,18 @@ class _CommerceHomeState extends State<CommerceHome> {
     {
       "image": "assets/icons/roadside.png",
       "service": "roadside \n    help",
-      "nav": RoadSideAssistance(subAdministrativeArea: '', street: '',)
+      "nav": RoadSideAssistance(
+        subAdministrativeArea: '',
+        street: '',
+      )
     },
     {
       "image": "assets/icons/washing.png",
       "service": "Car Wash",
-      "nav": const CarWash()
+      "nav": const CarWash(
+        subAdministrativeArea: '',
+        street: '',
+      )
     },
     {
       "image": "assets/icons/maintenance.png",
@@ -73,20 +80,29 @@ class _CommerceHomeState extends State<CommerceHome> {
     {
       "image": "assets/icons/belliaMart.png",
       "service": "Bellia Mart",
-      "nav":  BelliaMart()
+      "nav": BelliaMart()
     },
     {
       "image": "assets/icons/towing.png",
       "service": "Car Tow",
-      "nav":  CarTow(subAdministrativeArea: '', street: '',)
+      "nav": CarTow(
+        subAdministrativeArea: '',
+        street: '',
+      )
     },
   ];
 
   List dealsImages = [
-    {"image": "assets/images/delivery1.png", "nav":  BelliaMart()},
-    {"image": "assets/images/washpromo1.png", "nav": const CarWash()},
+    {
+      "image": "assets/images/washpromo1.png",
+      "nav": const CarWash(
+        subAdministrativeArea: '',
+        street: '',
+      )
+    },
     {"image": "assets/images/delivery2.png", "nav": BelliaMart()},
     {"image": "assets/images/repairpromo.png", "nav": const Maintenance()},
+    {"image": "assets/images/delivery1.png", "nav": BelliaMart()},
   ];
 
   List tipsImages = [
@@ -97,9 +113,23 @@ class _CommerceHomeState extends State<CommerceHome> {
     {"image": "assets/images/tip5.png"},
   ];
 
+ void _launchWhatsApp() async {
+    String url = 'whatsapp://send?phone=+201224622995';
+    await launch(url);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+          child: Icon(
+            Icons.chat_outlined,
+            size: 30,
+          ),
+          backgroundColor: Colors.red[500],
+          onPressed: () {
+            _launchWhatsApp();
+          }),
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
@@ -134,34 +164,31 @@ class _CommerceHomeState extends State<CommerceHome> {
               //   // )
               // ]),
               // Row(
-              //   mainAxisSize: MainAxisSize.min,
+              //   mainAxisSize: MainAxisSize.max,
               //   children: [
               //     Container(
               //       decoration: BoxDecoration(
               //         borderRadius: BorderRadius.circular(10),
               //         boxShadow: const [
               //           BoxShadow(
-              //             color: Color.fromARGB(255, 134, 130, 130),
-              //             blurRadius: 4.0,
-              //             offset: Offset(0, 5)
-              //           ),
+              //               color: Color.fromARGB(255, 134, 130, 130),
+              //               blurRadius: 4.0,
+              //               offset: Offset(0, 5)),
               //           BoxShadow(
-              //             color: Colors.white,
-              //             blurRadius: 5.0,
-              //             offset: Offset(-5, 0)
-              //           ),
+              //               color: Colors.white,
+              //               blurRadius: 5.0,
+              //               offset: Offset(-5, 0)),
               //           BoxShadow(
-              //             color: Colors.white,
-              //             blurRadius: 5.0,
-              //             offset: Offset(5, 0)
-              //           )
+              //               color: Colors.white,
+              //               blurRadius: 5.0,
+              //               offset: Offset(5, 0))
               //         ],
               //         color: const Color.fromARGB(255, 247, 63, 63),
               //       ),
-              //       padding: const EdgeInsets.all(8),
-              //       margin: const EdgeInsets.only(bottom: 13),
+              //       padding: const EdgeInsets.all(10),
+              //       margin: const EdgeInsets.only(top: 0, bottom: 15),
               //       child: const Text(
-              //         "Flash offers",
+              //         "Bellia Tip of the day",
               //         style: TextStyle(
               //           color: Colors.white,
               //           fontWeight: FontWeight.bold,
@@ -171,15 +198,15 @@ class _CommerceHomeState extends State<CommerceHome> {
               //     ),
               //   ],
               // ),
+
               Container(
-                  margin: EdgeInsets.only(top: Dimensions.height10),
+                  margin: const EdgeInsets.only(bottom: 0, top: 10),
                   decoration: BoxDecoration(
-                      //color: const Color.fromARGB(255, 199, 199, 199),
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: const [
                         BoxShadow(
-                            color: Color.fromARGB(255, 134, 130, 130),
-                            blurRadius: 4.0,
+                            color: Color.fromARGB(255, 41, 34, 34),
+                            blurRadius: 1.0,
                             offset: Offset(0, 5)),
                         BoxShadow(
                             color: Colors.white,
@@ -190,19 +217,14 @@ class _CommerceHomeState extends State<CommerceHome> {
                             blurRadius: 5.0,
                             offset: Offset(5, 0))
                       ]),
-                  height: 250,
+                  height: 210,
                   child: PageView.builder(
-                    itemCount: dealsImages.length,
+                    itemCount: tipsImages.length,
                     itemBuilder: (context, index) {
-                      return MaterialButton(
-                          onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) =>
-                                    dealsImages[index]["nav"]));
-                          },
-                          child: _buildDealsPageItem(index));
+                      return _buildTipsPageItem(index);
                     },
                   )),
+
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -245,8 +267,7 @@ class _CommerceHomeState extends State<CommerceHome> {
                   scrollDirection: Axis.horizontal,
                   itemCount: mostPopular.length,
                   itemBuilder: (context, i) {
-                    return Column(
-                      children: [
+                    return Column(children: [
                       Container(
                           margin: const EdgeInsets.only(right: 10),
                           height: 70,
@@ -357,9 +378,8 @@ class _CommerceHomeState extends State<CommerceHome> {
                   },
                 ),
               ),
-
               Row(
-                mainAxisSize: MainAxisSize.max,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
                     decoration: BoxDecoration(
@@ -380,10 +400,10 @@ class _CommerceHomeState extends State<CommerceHome> {
                       ],
                       color: const Color.fromARGB(255, 247, 63, 63),
                     ),
-                    padding: const EdgeInsets.all(10),
-                    margin: const EdgeInsets.only(top: 0, bottom: 15),
+                    padding: const EdgeInsets.all(8),
+                    margin: const EdgeInsets.only(bottom: 5),
                     child: const Text(
-                      "Bellia Tip of the day",
+                      "Flash offers",
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -393,15 +413,15 @@ class _CommerceHomeState extends State<CommerceHome> {
                   ),
                 ],
               ),
-
               Container(
-                  margin: const EdgeInsets.only(bottom: 10),
+                  margin: EdgeInsets.only(top: Dimensions.height10),
                   decoration: BoxDecoration(
+                      //color: const Color.fromARGB(255, 199, 199, 199),
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: const [
                         BoxShadow(
-                            color: Color.fromARGB(255, 41, 34, 34),
-                            blurRadius: 1.0,
+                            color: Color.fromARGB(255, 134, 130, 130),
+                            blurRadius: 4.0,
                             offset: Offset(0, 5)),
                         BoxShadow(
                             color: Colors.white,
@@ -412,13 +432,19 @@ class _CommerceHomeState extends State<CommerceHome> {
                             blurRadius: 5.0,
                             offset: Offset(5, 0))
                       ]),
-                  height: 210,
+                  height: 230,
                   child: PageView.builder(
-                    itemCount: tipsImages.length,
+                    itemCount: dealsImages.length,
                     itemBuilder: (context, index) {
-                      return _buildTipsPageItem(index);
+                      return MaterialButton(
+                          onPressed: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) =>
+                                    dealsImages[index]["nav"]));
+                          },
+                          child: _buildDealsPageItem(index));
                     },
-                  ))
+                  )),
             ],
           )),
     );
@@ -430,7 +456,7 @@ class _CommerceHomeState extends State<CommerceHome> {
         Container(
           //margin: const EdgeInsets.only(left: 5, right: 5),
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(25),
+              borderRadius: BorderRadius.circular(15),
               image: DecorationImage(
                   fit: BoxFit.fill,
                   image: AssetImage(
@@ -445,9 +471,9 @@ class _CommerceHomeState extends State<CommerceHome> {
     return Stack(
       children: [
         Container(
-          margin: const EdgeInsets.only(left: 5, right: 5),
+          margin: const EdgeInsets.only(left: 2, right: 2),
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(25),
+              borderRadius: BorderRadius.circular(20),
               image: DecorationImage(
                   fit: BoxFit.fill,
                   image: AssetImage(

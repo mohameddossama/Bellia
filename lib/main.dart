@@ -5,6 +5,8 @@ import 'package:fluttercourse/pages/commerceHome.dart';
 //import 'package:fluttercourse/pages/belliaMart.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fluttercourse/pages/login.dart';
+import 'package:fluttercourse/util/imageUrlProvider.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 //import 'package:firebase_messaging/firebase_messaging.dart';
 //import 'package:fluttercourse/pages/maintenance.dart';
@@ -23,7 +25,10 @@ void main() async {
    WidgetsFlutterBinding.ensureInitialized();
    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform,);
   // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+      create: (_) => ImageUrlProvider(),
+      child: MyApp(),
+    ),);
 }
 
 class MyApp extends StatefulWidget {

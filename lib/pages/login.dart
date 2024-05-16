@@ -1,9 +1,11 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttercourse/pages/forgotPass.dart';
+import 'package:fluttercourse/pages/forgetPassword.dart';
 import 'package:fluttercourse/pages/register.dart';
 import 'package:fluttercourse/pages/commerceHome.dart';
+import 'package:fluttercourse/util/dimensions.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class login_page extends StatefulWidget {
@@ -23,7 +25,9 @@ class login_pageState extends State<login_page> {
     // Trigger the authentication flow
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
-    if(googleUser==null){return;}
+    if (googleUser == null) {
+      return;
+    }
 
     // Obtain the auth details from the request
     final GoogleSignInAuthentication? googleAuth =
@@ -40,6 +44,51 @@ class login_pageState extends State<login_page> {
     Navigator.of(context).pushReplacement(MaterialPageRoute(
       builder: (context) => const CommerceHome(),
     ));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      content: Row(
+        children: [
+          Container(
+            color: Colors.green,
+            child: Icon(
+              Icons.check,
+              size: Dimensions.height30,
+              color: Colors.white,
+            ),
+          ),
+          SizedBox(
+            width: 5,
+          ),
+          Text(
+            "Logged in Successfully",
+            style: TextStyle(
+                fontSize: Dimensions.height22,
+                fontWeight: FontWeight.bold,
+                color: const Color.fromARGB(255, 0, 0, 0)),
+          ),
+        ],
+      ),
+      duration: Duration(seconds: 3),
+    ));
+  }
+
+  Future<void> updateUser(
+      String userEmail, Map<String, dynamic> newData) async {
+    try {
+      DocumentReference userDocRef =
+          FirebaseFirestore.instance.collection('users').doc(userEmail);
+
+      await userDocRef.update(newData);
+    } catch (error) {
+      print("Error updating user data: $error");
+    }
+  }
+
+  void onLoginPressed() {
+    Map<String, dynamic> updatedData = {
+      'password': passwordController.text,
+    };
+    updateUser(emailController.text, updatedData);
   }
 
   @override
@@ -171,7 +220,7 @@ class login_pageState extends State<login_page> {
                     child: TextButton(
                       onPressed: () {
                         Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => ForgotPass()));
+                            builder: (context) => Forgetpassword()));
                       },
                       child: const Text(
                         'Forgot password?',
@@ -183,80 +232,106 @@ class login_pageState extends State<login_page> {
                   //login button
                   TextButton(
                     onPressed: () async {
-                      // if (loginFormKey.currentState!.validate()) {
-                      //   login();
-                      //   Navigator.of(context).pushAndRemoveUntil(
-                      //     MaterialPageRoute(
-                      //         builder: (context) => const CommerceHome()),
-                      //     (Route<dynamic> route) => false,
-                      //   );
-                      // }
-                      try {
-                        final credential = await FirebaseAuth.instance
-                            .signInWithEmailAndPassword(
-                                email: emailController.text,
-                                password: passwordController.text);
-                        if (FirebaseAuth.instance.currentUser!.emailVerified ==
-                            false) {
-                          AwesomeDialog(
-                            context: context,
-                            animType: AnimType.rightSlide,
-                            dialogType: DialogType.error,
-                            body: Center(
-                              child: Center(
+                      if (loginFormKey.currentState!.validate()) {
+                        try {
+                          final credential = await FirebaseAuth.instance
+                              .signInWithEmailAndPassword(
+                                  email: emailController.text,
+                                  password: passwordController.text);
+                          if (FirebaseAuth
+                                  .instance.currentUser!.emailVerified ==
+                              false) {
+                            AwesomeDialog(
+                              context: context,
+                              animType: AnimType.rightSlide,
+                              dialogType: DialogType.error,
+                              body: Center(
+                                child: Center(
+                                  child: Text(
+                                    'Please check your inbox and verify your account before loging in',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                              title: 'This is Ignored',
+                              desc: 'This is also Ignored',
+                              btnOkOnPress: () {},
+                            )..show();
+                          } else {
+                            onLoginPressed();
+                            Navigator.of(context)
+                                .pushReplacement(MaterialPageRoute(
+                              builder: (context) => const CommerceHome(),
+                            ));
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              backgroundColor:
+                                  const Color.fromARGB(255, 255, 255, 255),
+                              content: Row(
+                                children: [
+                                  Container(
+                                    color: Colors.green,
+                                    child: Icon(
+                                      Icons.check,
+                                      size: Dimensions.height30,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    "Logged in Successfully",
+                                    style: TextStyle(
+                                        fontSize: Dimensions.height22,
+                                        fontWeight: FontWeight.bold,
+                                        color:
+                                            const Color.fromARGB(255, 0, 0, 0)),
+                                  ),
+                                ],
+                              ),
+                              duration: Duration(seconds: 3),
+                            ));
+                          }
+                        } on FirebaseAuthException catch (e) {
+                          if (e.code == 'user-not-found') {
+                            print('No user found with that email.');
+                            AwesomeDialog(
+                              context: context,
+                              animType: AnimType.rightSlide,
+                              dialogType: DialogType.error,
+                              body: Center(
                                 child: Text(
-                                  'Please check your inbox and verify your account before loging in',
+                                  'No user found with that email.',
                                   style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold),
                                 ),
                               ),
-                            ),
-                            title: 'This is Ignored',
-                            desc: 'This is also Ignored',
-                            btnOkOnPress: () {},
-                          )..show();
-                        } else {
-                          Navigator.of(context)
-                              .pushReplacement(MaterialPageRoute(
-                            builder: (context) => const CommerceHome(),
-                          ));
-                        }
-                      } on FirebaseAuthException catch (e) {
-                        if (e.code == 'user-not-found') {
-                          print('No user found with that email.');
-                          AwesomeDialog(
-                            context: context,
-                            animType: AnimType.rightSlide,
-                            dialogType: DialogType.error,
-                            body: Center(
-                              child: Text(
-                                'No user found with that email.',
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              title: 'This is Ignored',
+                              desc: 'This is also Ignored',
+                              btnOkOnPress: () {},
+                            )..show();
+                          } else if (e.code == 'wrong-password') {
+                            print('Wrong password provided for that user.');
+                            AwesomeDialog(
+                              context: context,
+                              animType: AnimType.rightSlide,
+                              dialogType: DialogType.error,
+                              body: Center(
+                                child: Text(
+                                  'Wrong password provided.',
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
                               ),
-                            ),
-                            title: 'This is Ignored',
-                            desc: 'This is also Ignored',
-                            btnOkOnPress: () {},
-                          )..show();
-                        } else if (e.code == 'wrong-password') {
-                          print('Wrong password provided for that user.');
-                          AwesomeDialog(
-                            context: context,
-                            animType: AnimType.rightSlide,
-                            dialogType: DialogType.error,
-                            body: Center(
-                              child: Text(
-                                'Wrong password provided for that user.',
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            title: 'This is Ignored',
-                            desc: 'This is also Ignored',
-                            btnOkOnPress: () {},
-                          )..show();
+                              title: 'This is Ignored',
+                              desc: 'This is also Ignored',
+                              btnOkOnPress: () {},
+                            )..show();
+                          }
                         }
                       }
                     },
@@ -268,7 +343,7 @@ class login_pageState extends State<login_page> {
                     child: const Text(
                       'Login',
                       style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                          //fontWeight: FontWeight.bold,
                           fontSize: 20,
                           color: Colors.white),
                     ),
@@ -297,13 +372,13 @@ class login_pageState extends State<login_page> {
                         Text(
                           'Login with Google',
                           style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
+                              //fontWeight: FontWeight.bold,
+                              fontSize: Dimensions.height20,
                               color: Colors.white),
                         ),
                         Container(
-                          width: 30,
-                          height: 30,
+                          width: Dimensions.widht30,
+                          height: Dimensions.height30,
                           decoration: BoxDecoration(
                               image: DecorationImage(
                                   image: AssetImage(
@@ -327,7 +402,7 @@ class login_pageState extends State<login_page> {
                   //         width: 25,
                   //         child: Image.asset('images/google_icon.PNG'))),
                   //register button
-                  const SizedBox(height: 20),
+                   SizedBox(height: Dimensions.height20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -338,7 +413,7 @@ class login_pageState extends State<login_page> {
                       TextButton(
                         onPressed: () {
                           Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const Register(),
+                            builder: (context) => Registration_page(),
                           ));
                         },
                         child: const Text(

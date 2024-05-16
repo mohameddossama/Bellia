@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttercourse/pages/car.dart';
+//import 'package:fluttercourse/pages/car.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart'; 
 
 class AddCar extends StatefulWidget {
   const AddCar({super.key});
@@ -26,6 +28,44 @@ class _AddCarState extends State<AddCar> {
   final plateNumberController = TextEditingController();
   final mileageController = TextEditingController();
   String selectedColor = 'Black';
+ final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+  void _saveCarToFirestore() async {
+  try {
+    Map<String, dynamic> carData = {
+      'car_brand': brandController.text,
+      'car_model': modelController.text,
+      'plate_number': '${plateLettersController.text}-${plateNumberController.text}',
+      'car_color': selectedColor,
+      'car_mileage': double.parse(mileageController.text),
+    };
+
+    String userEmail = FirebaseAuth.instance.currentUser!.email!;
+
+    await FirebaseFirestore.instance
+        .collection('users') 
+        .doc(userEmail) 
+        .collection('cars')
+        .doc(plateLettersController.text + '-' + plateNumberController.text)
+        .set(carData); 
+
+   _scaffoldMessengerKey.currentState?.showSnackBar(
+      const SnackBar(
+        content: Text('Car Added'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+
+    Navigator.pop(context);
+  } catch (e) {
+    print('Error saving car data: $e');
+    _scaffoldMessengerKey.currentState?.showSnackBar(
+      const SnackBar(
+        content: Text('An error occurred. Please try again.'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+}
 
   @override
   void dispose() {
@@ -40,6 +80,7 @@ class _AddCarState extends State<AddCar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldMessengerKey, 
       resizeToAvoidBottomInset: false,
       appBar:  AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
@@ -215,7 +256,7 @@ class _AddCarState extends State<AddCar> {
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return "Please enter car mileage";
-                            } else if (!RegExp(r'^\d{1,4}(?:\.\d{1,2})?$')
+                            } else if (!RegExp(r'^\d{1,10}(?:\.\d{1,2})?$')
                                 .hasMatch(value)) {
                               return "Enter a valid value";
                             }
@@ -268,31 +309,8 @@ class _AddCarState extends State<AddCar> {
               const Spacer(),
               FilledButton(
                 onPressed: () {
-                  if (addFormKey.currentState!.validate()) {
-                   
-                    Car newCar = Car(
-                        brandController.text,
-                        modelController.text,
-                        selectedColor,
-                        '${plateLettersController.text} - ${plateNumberController.text}');
-                    
-                    ownedCars.add(newCar);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Car Added'),
-                            Icon(
-                              Icons.check,
-                              color: Colors.green,
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
+                   _saveCarToFirestore();
                     Navigator.pop(context);
-                  }
                 },
                 style: FilledButton.styleFrom(
                   backgroundColor: Colors.red.shade800,

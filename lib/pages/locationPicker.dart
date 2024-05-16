@@ -1,4 +1,6 @@
 //import 'package:fluttercourse/pages/carWash.dart';
+import 'package:fluttercourse/pages/carTow.dart';
+import 'package:fluttercourse/pages/carWash.dart';
 import 'package:fluttercourse/pages/checkout.dart';
 import 'package:fluttercourse/pages/roadSideAssistance.dart';
 import 'package:geocoding/geocoding.dart';
@@ -8,8 +10,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class location_picker_page extends StatefulWidget {
   final String service_name;
- 
-  const location_picker_page({super.key, required this.service_name,});
+
+  const location_picker_page({
+    super.key,
+    required this.service_name,
+  });
 
   @override
   State<location_picker_page> createState() => _location_picker_pageState();
@@ -42,6 +47,40 @@ class _location_picker_pageState extends State<location_picker_page> {
   List<Marker> marks = [
     // Marker(markerId: MarkerId("1"), position: LatLng(30.028306, 31.273045)),
   ];
+
+  bool manuallyMoved = false;
+  Marker? userMarker;
+  void _moveToUserLocation() {
+    if (mounted && customer_lat != null && customer_long != null) {
+      gm_controller?.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(customer_lat!, customer_long!),
+            zoom: 16,
+          ),
+        ),
+      );
+
+      if (userMarker == null) {
+        // Add marker for user's location
+        userMarker = Marker(
+          markerId: const MarkerId("user_location"),
+          position: LatLng(customer_lat!, customer_long!),
+          infoWindow: const InfoWindow(title: "Your Location"),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+        );
+
+        marks.add(userMarker!); // Add marker to the list
+      } else {
+        // Update marker position
+        userMarker = userMarker!.copyWith(
+          positionParam: LatLng(customer_lat!, customer_long!),
+        );
+      }
+
+      setState(() {}); // Update the UI to show the marker
+    }
+  }
 
   Future<Position> _determinePosition() async {
     bool serviceEnabled;
@@ -77,14 +116,17 @@ class _location_picker_pageState extends State<location_picker_page> {
         "current lat: ${position!.latitude} current long: ${position!.longitude}");
     print("==================");
 
-    setState(() {
-      customer_long = position!.longitude;
-      customer_lat = position!.latitude;
-      init_camera_position = CameraPosition(
-        target: LatLng(customer_lat ?? 0, customer_long ?? 0),
-        zoom: 14,
-      );
-    });
+    if (mounted) {
+      // Check if the widget is still mounted before updating the state
+      setState(() {
+        customer_long = position!.longitude;
+        customer_lat = position!.latitude;
+        init_camera_position = CameraPosition(
+          target: LatLng(customer_lat ?? 0, customer_long ?? 0),
+          zoom: 14,
+        );
+      });
+    }
 
     return await Geolocator.getCurrentPosition();
   }
@@ -145,10 +187,20 @@ class _location_picker_pageState extends State<location_picker_page> {
                 gm_controller = controller;
               },
               onTap: (argument) async {
+                manuallyMoved = true;
                 print("======================");
                 print(
                     "lat is ${argument.latitude} and long is ${argument.longitude}");
                 print("======================");
+                marks.clear();
+                // Add new marker
+                userMarker = Marker(
+                  markerId: const MarkerId("1"),
+                  position: LatLng(argument.latitude, argument.longitude),
+                );
+
+                marks.add(userMarker!);
+
                 marks.add(Marker(
                     markerId: const MarkerId("1"),
                     position: LatLng(argument.latitude, argument.longitude)));
@@ -228,15 +280,33 @@ class _location_picker_pageState extends State<location_picker_page> {
                 minWidth: 200,
                 onPressed: () {
                   print("niggggggggggggggga is $subAdministrativeArea");
-                  if(widget.service_name == 'mart'){
-                     Navigator.of(context).push(MaterialPageRoute(builder: (context) => Checkout(subAdministrativeArea: subAdministrativeArea ?? "", street: street ?? "", itemDetailsList: [] ,)));
+                  if (widget.service_name == 'mart') {
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                        builder: (context) => Checkout(
+                              subAdministrativeArea:
+                                  subAdministrativeArea ?? "",
+                              street: street ?? "",
+                              itemDetailsList: [],
+                            )));
                   }
-                  if(widget.service_name == 'road'){
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => RoadSideAssistance(subAdministrativeArea: subAdministrativeArea ?? "", street: street ?? "")));
+                  if (widget.service_name == 'road') {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => RoadSideAssistance(
+                            subAdministrativeArea: subAdministrativeArea ?? "",
+                            street: street ?? "")));
                   }
-                  // if(widget.service_name == 'wash'){
-                  // Navigator.of(context).push(MaterialPageRoute(builder: (context) => CarWash(subAdministrativeArea: subAdministrativeArea ?? "", street: street ?? "")));
-                  // }
+                  if (widget.service_name == 'tow') {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => CarTow(
+                            subAdministrativeArea: subAdministrativeArea ?? "",
+                            street: street ?? "")));
+                  }
+                  if (widget.service_name == 'wash') {
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                        builder: (context) => CarWash(
+                            subAdministrativeArea: subAdministrativeArea ?? "",
+                            street: street ?? "")));
+                  }
                   if (country == null &&
                       administrativeArea == null &&
                       subAdministrativeArea == null &&
@@ -268,10 +338,7 @@ class _location_picker_pageState extends State<location_picker_page> {
                 child: IconButton(
                     onPressed: () {
                       setState(() {
-                        init_camera_position = CameraPosition(
-                          target: LatLng(customer_lat!, customer_long!),
-                          zoom: 14,
-                        );
+                        _moveToUserLocation();
                       });
                     },
                     icon: const Icon(

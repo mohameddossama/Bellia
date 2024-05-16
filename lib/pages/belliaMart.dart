@@ -4,9 +4,9 @@ import 'package:fluttercourse/pages/itemInfoPage.dart';
 import 'package:fluttercourse/util/belliaItems.dart';
 import 'package:fluttercourse/util/customSearch.dart';
 import 'package:fluttercourse/util/dimensions.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BelliaMart extends StatefulWidget {
-  
   const BelliaMart({Key? key}) : super(key: key);
 
   @override
@@ -16,6 +16,7 @@ class BelliaMart extends StatefulWidget {
 class _BelliaMartState extends State<BelliaMart> {
   final ScrollController _accessorieTypeController = ScrollController();
   final ScrollController _accessorieItemsController = ScrollController();
+  late SharedPreferences pref;
   final List<String> _accessorieTypes = [
     'Interior Accessories',
     'Car Care',
@@ -74,35 +75,30 @@ class _BelliaMartState extends State<BelliaMart> {
       _isSelected[itemName] = !_isSelected[itemName]!;
     });
   }
-void _updateItemCount(Map<String, int> updatedItems) {
-  setState(() {
-    if (updatedItems.isEmpty) {
-      // If cart is empty, clear quantity and set all items to not selected
-      _quantity.clear();
-      accessoryCategories.forEach((accessorieType, items) {
-        items.forEach((item) {
-          _isSelected[item['description']] = false;
+
+  void _updateItemCount(Map<String, int> updatedItems) {
+    setState(() {
+      if (updatedItems.isEmpty) {
+        _quantity.clear();
+        accessoryCategories.forEach((accessorieType, items) {
+          items.forEach((item) {
+            _isSelected[item['description']] = false;
+          });
         });
-      });
-    } else {
-      // Clear all items to not selected
-      _isSelected.forEach((key, value) {
-        _isSelected[key] = false;
-      });
+      } else {
+        _isSelected.forEach((key, value) {
+          _isSelected[key] = false;
+        });
 
-      // Update quantity for each item and set selected state accordingly
-      updatedItems.forEach((itemName, newCount) {
-        _quantity[itemName] = newCount;
-        if (_quantity[itemName]! > 0) {
-          _isSelected[itemName] = true;
-        }
-      });
-    }
-  });
-}
-
-
-
+        updatedItems.forEach((itemName, newCount) {
+          _quantity[itemName] = newCount;
+          if (_quantity[itemName]! > 0) {
+            _isSelected[itemName] = true;
+          }
+        });
+      }
+    });
+  }
 
   void navigateToCartPage() {
     Map<String, Map<String, String>> selectedItemsWithDetails = {};
@@ -128,40 +124,77 @@ void _updateItemCount(Map<String, int> updatedItems) {
       context,
       MaterialPageRoute(
           builder: (context) => CartPage(
-                cartItems: selectedItemsWithDetails, updateItemCount: _updateItemCount,
-
+                cartItems: selectedItemsWithDetails,
+                updateItemCount: _updateItemCount,
               )),
     );
   }
 
- void navigateToItemInfoPage(
-    String itemName, String itemPrice, String imagePath) {
-  if (_isSelected[itemName] == false) {
-    _quantity[itemName] = 0;
-  }
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => ItemInfoPage(
-        itemName: itemName,
-        itemPrice: itemPrice,
-        imagePath: imagePath,
-        quantity: _quantity[itemName] ?? 0,
-        updateCounter: (itemName, quantity) {
-          setState(() {
-            _quantity[itemName] = quantity;
-            if (quantity > 0) {
-              _isSelected[itemName] = true;
-            } else {
-              _isSelected[itemName] = false;
-            }
-          });
-        },
+  void navigateToItemInfoPage(
+      String itemName, String itemPrice, String imagePath) {
+    if (_isSelected[itemName] == false) {
+      _quantity[itemName] = 0;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ItemInfoPage(
+          itemName: itemName,
+          itemPrice: itemPrice,
+          imagePath: imagePath,
+          quantity: _quantity[itemName] ?? 0,
+          updateCounter: (itemName, quantity) {
+            setState(() {
+              _quantity[itemName] = quantity;
+              if (quantity > 0) {
+                _isSelected[itemName] = true;
+              } else {
+                _isSelected[itemName] = false;
+              }
+            });
+          },
+        ),
       ),
-    ),
-  );
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getCache();
+    _initSharedPreferences();
+  }
+
+  Future<void> getCache() async {
+    pref = await SharedPreferences.getInstance();
+    _quantity.forEach((itemName, _) {
+      int? cachedQuantity = pref.getInt(itemName) ?? 0;
+      _quantity[itemName] = cachedQuantity;
+    });
+  }
+
+ Future<void> _initSharedPreferences() async {
+  pref = await SharedPreferences.getInstance();
+  await getCache();
 }
 
+void updateQuantity(String itemName, int quantity) {
+  setState(() {
+    _quantity[itemName] = quantity;
+    setCache(itemName, quantity); 
+  });
+}
+
+  Future<void> setCache(String itemName, int quantity) async {
+    await pref.setInt(itemName, quantity);
+  }
+
+// Future<void> clearCache() async {
+//   SharedPreferences pref = await SharedPreferences.getInstance();
+//   _quantity.keys.forEach((itemName) {
+//     pref.remove(itemName);
+//   });
+// }
 
   @override
   Widget build(BuildContext context) {
@@ -191,22 +224,22 @@ void _updateItemCount(Map<String, int> updatedItems) {
                   ),
                 ),
                 IconButton(
-              onPressed: () {
-                navigateToCartPage();
-              },
-              icon: const Icon(
-                Icons.shopping_cart_outlined,
-                size: 27,
-              ),
-            )
+                  onPressed: () {
+                    navigateToCartPage();
+                  },
+                  icon: const Icon(
+                    Icons.shopping_cart_outlined,
+                    size: 27,
+                  ),
+                )
               ],
             ),
-            
           ],
         ),
         backgroundColor: const Color.fromARGB(255, 224, 58, 58),
       ),
       body: Container(
+        height: 800,
         decoration:
             const BoxDecoration(color: Color.fromARGB(255, 243, 241, 241)),
         child: Column(
@@ -253,7 +286,7 @@ void _updateItemCount(Map<String, int> updatedItems) {
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: ElevatedButton(
                         style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
+                          backgroundColor: WidgetStateProperty.all(
                             const Color.fromARGB(255, 224, 58, 58),
                           ),
                         ),
@@ -389,8 +422,9 @@ void _updateItemCount(Map<String, int> updatedItems) {
                                         ),
                                       ),
                                       Container(
-                                        padding:  EdgeInsets.symmetric(
-                                            horizontal: Dimensions.widht15, vertical: 0),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: Dimensions.widht15,
+                                            vertical: 0),
                                         margin: EdgeInsets.only(
                                             top: Dimensions.height5),
                                         height: Dimensions.height35,
@@ -400,17 +434,17 @@ void _updateItemCount(Map<String, int> updatedItems) {
                                           color: const Color.fromARGB(
                                               255, 224, 58, 58),
                                         ),
-                                        child: _isSelected[itemName] == true && _quantity[itemName] != 0
+                                        child: _isSelected[itemName] == true &&
+                                                _quantity[itemName] != 0
                                             ? Container(
-                                                width:Dimensions.height150,
+                                                width: Dimensions.height150,
                                                 child: Row(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.center,
                                                   children: [
                                                     Container(
-                                                      margin:
-                                                           EdgeInsets.only(
-                                                              right:5 ),
+                                                      margin: EdgeInsets.only(
+                                                          right: 5),
                                                       child: IconButton(
                                                         onPressed: () {
                                                           setState(() {
@@ -422,10 +456,16 @@ void _updateItemCount(Map<String, int> updatedItems) {
                                                                   (_quantity[itemName] ??
                                                                           1) -
                                                                       1;
+                                                              updateQuantity(
+                                                                  itemName,
+                                                                  _quantity[
+                                                                      itemName]!);
                                                             } else {
                                                               _isSelected[
                                                                       itemName] =
                                                                   false;
+                                                              updateQuantity(
+                                                                  itemName, 0);
                                                             }
                                                           });
                                                         },
@@ -435,28 +475,27 @@ void _updateItemCount(Map<String, int> updatedItems) {
                                                       ),
                                                     ),
                                                     Container(
-                                                      padding:  EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: Dimensions.height10),
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal:
+                                                                  Dimensions
+                                                                      .height10),
                                                       decoration: BoxDecoration(
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(5),
                                                         color: Color.fromARGB(
-                                                            255,
-                                                            255,
-                                                            255,
-                                                            255), // Change color as desired
+                                                            255, 255, 255, 255),
                                                       ),
                                                       child: Text(
                                                         _quantity[itemName]
                                                             .toString(),
-                                                        style:  TextStyle(
-                                                          color: Colors
-                                                              .black, // Change color as desired
+                                                        style: TextStyle(
+                                                          color: Colors.black,
                                                           fontWeight:
                                                               FontWeight.bold,
-                                                          fontSize: Dimensions.height17,
+                                                          fontSize: Dimensions
+                                                              .height17,
                                                         ),
                                                       ),
                                                     ),
@@ -472,6 +511,10 @@ void _updateItemCount(Map<String, int> updatedItems) {
                                                                 (_quantity[itemName] ??
                                                                         1) +
                                                                     1;
+                                                            updateQuantity(
+                                                                itemName,
+                                                                _quantity[
+                                                                    itemName]!);
                                                           });
                                                         },
                                                         icon: const Icon(
@@ -482,15 +525,14 @@ void _updateItemCount(Map<String, int> updatedItems) {
                                                   ],
                                                 ),
                                               )
-                                            : 
-                                            MaterialButton(
+                                            : MaterialButton(
                                                 onPressed: () {
                                                   setState(() {
                                                     _quantity[itemName] = 1;
                                                     toggleEdit(itemName);
                                                   });
                                                 },
-                                                child: const Text(
+                                                child: Text(
                                                   "ADD TO CART",
                                                   style: TextStyle(
                                                     color: Colors.white,

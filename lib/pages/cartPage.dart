@@ -30,7 +30,6 @@ class _CartPageState extends State<CartPage> {
     
   }
 
-   // Function to create a list of maps containing details of each item
   List<Map<String, dynamic>> getItemDetailsList() {
     List<Map<String, dynamic>> itemDetailsList = [];
 
@@ -53,7 +52,6 @@ class _CartPageState extends State<CartPage> {
         'quantity': quantity.toString(),
       };
 
-      // Update or add the item to itemCounts
       itemCounts[itemName] = quantity;
     });
   }
@@ -141,7 +139,6 @@ class _CartPageState extends State<CartPage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                // Widget for item image and remove button
                                 Column(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,
@@ -253,12 +250,10 @@ class _CartPageState extends State<CartPage> {
                                               setState(() {
                                                 if (itemCount > 0) {
                                                   itemCount--;
-                                                  // Update quantity in itemCounts
                                                   itemCounts[itemName] =
                                                       itemCount;
                                                 }
                                                 if (itemCount == 0) {
-                                                  // Remove item from cartItems and itemCounts if count reaches 0
                                                   widget.cartItems
                                                       .remove(itemName);
                                                   itemCounts.remove(itemName);
