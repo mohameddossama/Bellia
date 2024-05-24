@@ -66,7 +66,7 @@ class _MaintenanceState extends State<Maintenance> {
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController mobileNumberController = TextEditingController();
-  final TextEditingController remarksController = TextEditingController();
+  final TextEditingController remarksController = TextEditingController(text: '');
   final TextEditingController carNameController = TextEditingController();
   final TextEditingController carModelController = TextEditingController();
   final TextEditingController carColorController = TextEditingController();
@@ -198,7 +198,7 @@ class _MaintenanceState extends State<Maintenance> {
           'Date and Time': formattedDateTime,
           'Service': 'Car Maintenance',
           "Payment Method": '',
-          'Service cost':'',
+          'Total Service cost':'',
         });
         DocumentReference orderDocRef =
             orders.doc(userEmail + " - " + formattedDateTime+ " - " + 'Car Maintenance');
@@ -218,7 +218,7 @@ class _MaintenanceState extends State<Maintenance> {
           'Service': 'Car Maintenance',
           "Payment Method": '',
           'Estimated time of arrival':'20 min',
-          'Service cost':'',
+          'Total Service cost':'',
         });
 
 

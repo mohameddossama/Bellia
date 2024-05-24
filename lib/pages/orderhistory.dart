@@ -67,7 +67,7 @@ Stream<List<Map<String, dynamic>>> fetchOrderDataStream() {
       throw Exception("No user logged in");
     }
     String queryPrefix = '$userEmail - ';
-    List<String> options = ['Roadside Assistance', 'car wash our center', 'car wash your place', 'Car Towing', 'Bellia Mart', 'Garage',"Maintenance"];
+    List<String> options = ['Roadside Assistance', 'car wash: our center', 'car wash: your place', 'Car Towing', 'Bellia Mart', 'Garage',"Maintenance"];
 
     return FirebaseFirestore.instance
         .collection('orders')
@@ -138,8 +138,8 @@ Stream<List<Map<String, dynamic>>> fetchOrderDataStream() {
                   return 
                   order['Status'] == 'Completed'||order['Status'] =='Canceled'
                   ? Container(
-                    padding: const EdgeInsets.all(5),
-                    margin: const EdgeInsets.only(top: 15, left: 8, right: 8),
+                    padding:  EdgeInsets.all(Dimensions.height5),
+                    margin: EdgeInsets.only(top:Dimensions.height12, left: 8, right: 8),
                     height: Dimensions.height130,
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -147,7 +147,7 @@ Stream<List<Map<String, dynamic>>> fetchOrderDataStream() {
                         width: 1.5,
                         color: const Color.fromARGB(255, 153, 12, 12),
                       ),
-                      borderRadius: BorderRadius.circular(15),
+                      borderRadius: BorderRadius.circular(Dimensions.height15),
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -218,7 +218,7 @@ Stream<List<Map<String, dynamic>>> fetchOrderDataStream() {
                                         // );
                                         Scaffold.of(context).showBottomSheet((BuildContext context){
                                                       return Container(
-                                                        height:Dimensions.height375,
+                                                        height:order['Service'] == 'Bellia Mart'?Dimensions.height320:order['Service']=='Garage'?Dimensions.height390:Dimensions.height375,
                                                         width: Dimensions.widht500,
                                                         padding: EdgeInsets.all(Dimensions.height20),
                                                         child: Column(
@@ -231,18 +231,20 @@ Stream<List<Map<String, dynamic>>> fetchOrderDataStream() {
                                                               width: Dimensions.widht130,
                                                                decoration: BoxDecoration(
                                                                 borderRadius: BorderRadius.all(Radius.circular(10)),
-                                                                  border: Border.all(color: Colors.red,width: 1.5),),
+                                                                  border: Border.all(color: const Color.fromARGB(255, 224, 58, 58),width: 2),),
                                                               child: Container(
                                                                 height: Dimensions.height100,
                                                                 decoration: BoxDecoration(
-                                                                  image: DecorationImage(image: AssetImage('assets/images/Map.png'))),
+                                                                  image: DecorationImage(
+                                                                    fit: BoxFit.contain,
+                                                                    image: AssetImage('assets/images/Map.png'))),
                                                               ),
                                                             ),
-                                                            SizedBox(width: Dimensions.widht10,),
+                                                           SizedBox(width: Dimensions.widht10,),
                                                             Column(
                                                                 mainAxisAlignment: MainAxisAlignment.start,
                                                                 children: [
-                                                                  SizedBox(height: Dimensions.height10,),
+                                                                  SizedBox(height: Dimensions.height20,),
                                                                   Row(
                                                                     children: [
                                                                       Icon(Icons.location_on,color: const Color.fromARGB(255, 224, 58, 58),),
@@ -257,8 +259,11 @@ Stream<List<Map<String, dynamic>>> fetchOrderDataStream() {
                                                                           ),
                                                                     ],
                                                                   ),
-                                                                  SizedBox(height: Dimensions.height10,),
-                                                                  Row(
+                                                                 
+                                                                  SizedBox(height: Dimensions.height5,),
+                                                                  order['Land mark']==null||order['Land mark']==' '
+                                                                  ?Container()
+                                                                  :Row(
                                                                     children: [
                                                                       Icon(Icons.star_rate,color: const Color.fromARGB(255, 224, 58, 58),),
                                                                       SizedBox(width: 2,),
@@ -272,7 +277,7 @@ Stream<List<Map<String, dynamic>>> fetchOrderDataStream() {
                                                                           ),
                                                                     ],
                                                                   ),
-                                                                   SizedBox(height: Dimensions.height10,),
+                                                                   SizedBox(height: Dimensions.height5,),
                                                                   Row(
                                                               children: [
                                                                 Text('Ordered : ',style: TextStyle(
@@ -292,7 +297,23 @@ Stream<List<Map<String, dynamic>>> fetchOrderDataStream() {
                                                               ),
                                                               ],
                                                             ),
-                                                            SizedBox(height: Dimensions.height20,),
+                                                            SizedBox(height: Dimensions.height10,),
+                                                                  Row(
+                                                              children: [
+                                                                Text('Service : ',style: TextStyle(
+                                                                  fontSize: Dimensions.height15,
+                                                                  fontWeight: FontWeight.bold,
+                                                                  color: const Color.fromARGB(255, 224, 58, 58)),),
+                                                                SizedBox(
+                                                                  width: Dimensions.widht160,
+                                                                  child: Text(order['Service']??'',
+                                                                  maxLines: 1,
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                  style: TextStyle(fontWeight: FontWeight.bold,),),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            SizedBox(height: Dimensions.height10,),
                                                             Row(
                                                               children: [
                                                                 Text('Customer : ',style: TextStyle(
@@ -304,25 +325,88 @@ Stream<List<Map<String, dynamic>>> fetchOrderDataStream() {
                                                                 Text(order['User last name']??'',style: TextStyle(fontWeight: FontWeight.bold),)
                                                               ],
                                                             ),
+                                                            order['Payment Method']==null||order['Payment Method']==''
+                                                            ?SizedBox.shrink()
+                                                            :SizedBox(height: Dimensions.height10,),
+                                                            order['Payment Method']==null||order['Payment Method']==''
+                                                            ?SizedBox.shrink()
+                                                            :Row(
+                                                              children: [
+                                                                Text('Payment Method : ',style: TextStyle(
+                                                                  fontSize: Dimensions.height15,
+                                                                  fontWeight: FontWeight.bold,
+                                                                  color: const Color.fromARGB(255, 224, 58, 58)),),
+                                                                Text(order['Payment Method']??'',style: TextStyle(fontWeight: FontWeight.bold),),
+                                                               
+                                                              ],
+                                                            ),
+                                                            order['Service'] == 'Bellia Mart'
+                                                            ?SizedBox.shrink()
+                                                            :SizedBox(height: Dimensions.height10,),
+                                                                   order['Service']=='Garage'
+                                                            ? Column(
+                                                              children: [
+                                                                Row(
+                                                              children: [
+                                                                 Row(
+                                                              children: [
+                                                                Text('Package Name : ',style: TextStyle(
+                                                                  fontSize: Dimensions.height15,
+                                                                  fontWeight: FontWeight.bold,
+                                                                  color: const Color.fromARGB(255, 224, 58, 58)),),
+                                                                Text(order['Package name']??'',style: TextStyle(fontWeight: FontWeight.bold,fontSize: Dimensions.height12),),
+                                                              ],
+                                                            ),
+                                                            SizedBox(width: Dimensions.widht20,),
+                                                                Text('Package Price : ',style: TextStyle(
+                                                                  fontSize: Dimensions.height15,
+                                                                  fontWeight: FontWeight.bold,
+                                                                  color: const Color.fromARGB(255, 224, 58, 58)),),
+                                                                Text(order['Single Week Price']??'',style: TextStyle(fontWeight: FontWeight.bold,fontSize: Dimensions.height12),),
+                                                                SizedBox(width: Dimensions.widht5,),
+                                                                Text('/ Week',style: TextStyle(fontWeight: FontWeight.bold,fontSize: Dimensions.height12),),
+                                                              ],
+                                                            ),
                                                             SizedBox(height: Dimensions.height10,),
                                                             Row(
+                                                              children: [
+                                                                Text('Number Of Weeks: ',style: TextStyle(
+                                                                  fontSize: Dimensions.height15,
+                                                                  fontWeight: FontWeight.bold,
+                                                                  color: const Color.fromARGB(255, 224, 58, 58)),),
+                                                                Text(order['Number of weeks']??'',style: TextStyle(fontWeight: FontWeight.bold),),
+                                                              ],
+                                                            ),
+
+                                                              ],
+                                                            )
+                                                            
+                                                            :order['Service'] == 'Bellia Mart'
+                                                            ?SizedBox.shrink()
+                                                            :order['Issue']!=''||order['Description(Optional)']!=''
+                                                            ?Row(
                                                               children: [
                                                                 Text('Customer Notes :  ',style: TextStyle(
                                                                   fontSize: Dimensions.height15,
                                                                   fontWeight: FontWeight.bold,
                                                                   color: const Color.fromARGB(255, 224, 58, 58)),),
                                                                 SizedBox(
-                                                                  width: Dimensions.widht200,
+                                                                  width: Dimensions.widht228,
                                                                   child: Text(order['Issue']??order['Description(Optional)'],
-                                                                  maxLines: 2,
+                                                                  maxLines: 1,
                                                                   overflow: TextOverflow.ellipsis,
                                                                   style: TextStyle(fontWeight: FontWeight.bold),),
                                                                 )
                                                               
                                                               ],
-                                                            ),
-                                                            SizedBox(height: Dimensions.height10,),
-                                                            Row(
+                                                            )
+                                                            :SizedBox.shrink(),
+                                                            order['Issue']!=''||order['Description(Optional)']!=''
+                                                            ?SizedBox(height: Dimensions.height10,)
+                                                            :SizedBox.shrink(),
+                                                            order['Service']=='Bellia Mart'
+                                                            ?SizedBox.shrink()
+                                                            :Row(
                                                               children: [
                                                                  Row(
                                                               children: [
@@ -337,7 +421,7 @@ Stream<List<Map<String, dynamic>>> fetchOrderDataStream() {
                                                                 Text(order['Car model']??'',style: TextStyle(fontWeight: FontWeight.bold),)
                                                               ],
                                                             ),
-                                                            SizedBox(width: Dimensions.widht46,),
+                                                            SizedBox(width: Dimensions.widht45,),
                                                                 Text('Plate Number : ',style: TextStyle(
                                                                   fontSize: Dimensions.height15,
                                                                   fontWeight: FontWeight.bold,
@@ -345,7 +429,9 @@ Stream<List<Map<String, dynamic>>> fetchOrderDataStream() {
                                                                 Text(order['Plate number']??'',style: TextStyle(fontWeight: FontWeight.bold),),
                                                               ],
                                                             ),
-                                                             SizedBox(height: Dimensions.height15,),
+                                                            order['Service']=='Bellia Mart'
+                                                            ?SizedBox.shrink()
+                                                            :SizedBox(height: Dimensions.height10,),
                                                             Row(
                                                               children: [
                                                                 Text('Order Status: ',style: TextStyle(
@@ -355,7 +441,7 @@ Stream<List<Map<String, dynamic>>> fetchOrderDataStream() {
                                                                 Text(order['Confirmed Status']??'',style: TextStyle(fontWeight: FontWeight.bold),),
                                                               ],
                                                             ),
-                                                            SizedBox(height: Dimensions.height35,),
+                                                            SizedBox(height: Dimensions.height10,),
                                                             order['Status'] == 'Completed'
                                                             ?Row(
                                                               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -369,14 +455,421 @@ Stream<List<Map<String, dynamic>>> fetchOrderDataStream() {
                                                                     ),
                                                                     child: TextButton(
                                                                       onPressed: () {
-                                                                        Navigator.of(context).push(
-                                                                        MaterialPageRoute(
-                                                                          builder: (context) =>
-                                                                              Orderdetails(
-                                                                             documentName: '${FirebaseAuth.instance.currentUser?.email} - ${order['Date and Time']} - ${order['Service']}',
+                                                                      //   Navigator.of(context).push(
+                                                                      //   MaterialPageRoute(
+                                                                      //     builder: (context) =>
+                                                                      //         Orderdetails(
+                                                                      //        documentName: '${FirebaseAuth.instance.currentUser?.email} - ${order['Date and Time']} - ${order['Service']}',
+                                                                      //     ),
+                                                                      //   ),
+                                                                      // );
+                                                                      showDialog(
+                                                                      context: context,
+                                                                      builder: (BuildContext context) {
+                                                                        if(order['Service']=='Garage'){
+                                                                        return AlertDialog(
+                                                                          title: Container(
+                                                                            width: 10,
+                                                                            padding: EdgeInsets.all(5),
+                                                                            decoration: BoxDecoration(
+                                                                              color: Colors.black,
+                                                                              borderRadius: BorderRadius.circular(20)
+                                                                            ),
+                                                                            child: Center(child: Text('Order Receipt',style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white),))),
+                                                                          content: Column(
+                                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                            mainAxisSize: MainAxisSize.min,
+                                                                            children: [
+                                                                              
+                                                                              SizedBox(height: Dimensions.height10,),
+                                                                              Row(
+                                                                                children: [
+                                                                                  Icon(Icons.attach_money_rounded,color: const Color.fromARGB(255, 224, 58, 58)),
+                                                                                  SizedBox(width: Dimensions.widht5,),
+                                                                                  Text('Single Week Price: ${order['Single Week Price']}',style: TextStyle(fontSize: Dimensions.height17)),
+                                                                                ],
+                                                                              ),
+                                                                              SizedBox(height: Dimensions.height10,),
+                                                                              Row(
+                                                                                children: [
+                                                                                  Icon(Icons.calendar_month_outlined, color: const Color.fromARGB(255, 224, 58, 58)),
+                                                                                  SizedBox(width: Dimensions.widht5,),
+                                                                                  Text('Number Of Weeks: ${order['Number of weeks']}',style: TextStyle(fontSize:Dimensions.height17)),
+                                                                                ],
+                                                                              ),
+                                                                             SizedBox(height: Dimensions.height50,),
+                                                                              Row(
+                                                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                                                children: [
+                                                                                  // Icon(Icons.add,color: const Color.fromARGB(255, 224, 58, 58)),
+                                                                                  // SizedBox(width: Dimensions.widht5,),
+                                                                                  Text('Total Price: ${order['Total Service cost']}',style: TextStyle(fontSize: Dimensions.height17,fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 224, 58, 58))),
+                                                                                ],
+                                                                              ),
+                                                                              SizedBox(height: Dimensions.height5,),
+                                                                              order['Status']=='Completed'
+                                                                              ?Row(
+                                                                                  mainAxisAlignment: MainAxisAlignment.end,
+                                                                                  children: [
+                                                                              Container(
+                                                                                width: Dimensions.widht150,
+                                                                                child:
+                                                                                  Text(
+                                                                                    "Please Contact Us as soon as possible regarding the contract",
+                                                                                    style: TextStyle(fontSize: Dimensions.height10,fontWeight: FontWeight.bold,color: Colors.black),
+                                                                                    maxLines: 2,
+                                                                                    overflow: TextOverflow.ellipsis,
+                                                                                  ))
+                                                                                  ],)
+                                                                                  :Container(),
+                                                                            ],
                                                                           ),
-                                                                        ),
-                                                                      );
+                                                                          actions: [
+                                                                            TextButton(
+                                                                              onPressed: () {
+                                                                                Navigator.of(context).pop();
+                                                                              },
+                                                                              child: Text('Close',style: TextStyle(fontWeight: FontWeight.bold),),
+                                                                            ),
+                                                                          ],
+                                                                        );}
+                                                                        else if( order['Service']=='Car Towing'){
+                                                                         return AlertDialog(
+                                                                          title: Container(
+                                                                            width: 10,
+                                                                            padding: EdgeInsets.all(5),
+                                                                            decoration: BoxDecoration(
+                                                                              color: Colors.black,
+                                                                              borderRadius: BorderRadius.circular(20)
+                                                                            ),
+                                                                            child: Center(child: Text('Order Receipt',style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white),))),
+                                                                            content: Column(
+                                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                            mainAxisSize: MainAxisSize.min,
+                                                                            children: [
+                                                                              
+                                                                              SizedBox(height: Dimensions.height10,),
+                                                                              Row(
+                                                                                children: [
+                                                                                  Icon(Icons.speed,color: const Color.fromARGB(255, 224, 58, 58)),
+                                                                                  SizedBox(width: Dimensions.widht5,),
+                                                                                  Text('Single Kilometer Price: ${order['Single kilometer price']}',style: TextStyle(fontSize: Dimensions.height15)),
+                                                                                ],
+                                                                              ),
+                                                                              SizedBox(height: Dimensions.height10,),
+                                                                              Row(
+                                                                                children: [
+                                                                                  Icon(Icons.numbers_outlined, color: const Color.fromARGB(255, 224, 58, 58)),
+                                                                                  SizedBox(width: Dimensions.widht5,),
+                                                                                  Text('Towing Distance: ${order['Number of kilometers']}',style: TextStyle(fontSize:Dimensions.height15)),
+                                                                                ],
+                                                                              ),
+                                                                             SizedBox(height: Dimensions.height50,),
+                                                                              Row(
+                                                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                                                children: [
+                                                                                  // Icon(Icons.add,color: const Color.fromARGB(255, 224, 58, 58)),
+                                                                                  // SizedBox(width: Dimensions.widht5,),
+                                                                                  Text('Total Price: ${order['Total Service cost']}',style: TextStyle(fontSize: Dimensions.height17,fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 224, 58, 58))),
+                                                                                ],
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                            actions: [
+                                                                            TextButton(
+                                                                              onPressed: () {
+                                                                                Navigator.of(context).pop();
+                                                                              },
+                                                                              child: Text('Close',style: TextStyle(fontWeight: FontWeight.bold),),
+                                                                            ),
+                                                                          ],
+                                                                         );
+                                                                        }
+                                                                         else if( order['Service']=='Roadside Assistance'){
+                                                                         return AlertDialog(
+                                                                          title: Container(
+                                                                            width: 10,
+                                                                            padding: EdgeInsets.all(5),
+                                                                            decoration: BoxDecoration(
+                                                                              color: Colors.black,
+                                                                              borderRadius: BorderRadius.circular(20)
+                                                                            ),
+                                                                            child: Center(child: Text('Order Receipt',style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white),))),
+                                                                            content: Column(
+                                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                            mainAxisSize: MainAxisSize.min,
+                                                                            children: [
+                                                                              
+                                                                              SizedBox(height: Dimensions.height10,),
+                                                                              Row(
+                                                                                children: [
+                                                                                  Icon(Icons.speed,color: const Color.fromARGB(255, 224, 58, 58)),
+                                                                                  SizedBox(width: Dimensions.widht5,),
+                                                                                  Text('Single Kilometer Price: ${order['Single kilometer price']}',style: TextStyle(fontSize: Dimensions.height15)),
+                                                                                ],
+                                                                              ),
+                                                                              SizedBox(height: Dimensions.height10,),
+                                                                              Row(
+                                                                                children: [
+                                                                                  Icon(Icons.numbers_outlined, color: const Color.fromARGB(255, 224, 58, 58)),
+                                                                                  SizedBox(width: Dimensions.widht5,),
+                                                                                  Text('Towing Distance: ${order['Number of kilometers']}',style: TextStyle(fontSize:Dimensions.height15)),
+                                                                                ],
+                                                                              ),
+                                                                              order['Additional services cost 1']!=''||order['Additional services 1']!=''
+                                                                              ?SizedBox(height: Dimensions.height10,)
+                                                                              :SizedBox.shrink(),
+                                                                              order['Additional services cost 1']!=''||order['Additional services 1']!=''
+                                                                              ? Row(
+                                                                                children: [
+                                                                                  Icon(Icons.note_add,color: const Color.fromARGB(255, 224, 58, 58)),
+                                                                                  SizedBox(width: Dimensions.widht5,),
+                                                                                  Text('${order['Additional services 1']} : ${order['Additional services cost 1']} ',style: TextStyle(fontSize: Dimensions.height15)),
+                                                                                ],
+                                                                              )
+                                                                              :SizedBox.shrink(),
+                                                                              order['Additional services cost 2']!=''||order['Additional services 2']!=''
+                                                                              ?SizedBox(height: Dimensions.height10,)
+                                                                              :SizedBox.shrink(),
+                                                                              order['Additional services cost 2']!=''||order['Additional services 2']!=''
+                                                                              ? Row(
+                                                                                children: [
+                                                                                  Icon(Icons.note_add,color: const Color.fromARGB(255, 224, 58, 58)),
+                                                                                  SizedBox(width: Dimensions.widht5,),
+                                                                                  Text('${order['Additional services 2']} : ${order['Additional services cost 2']} ',style: TextStyle(fontSize: Dimensions.height15)),
+                                                                                ],
+                                                                              )
+                                                                              :SizedBox.shrink(),
+                                                                              order['Additional services cost 3']!=''||order['Additional services 3']!=''
+                                                                              ?SizedBox(height: Dimensions.height10,)
+                                                                              :SizedBox.shrink(),
+                                                                              order['Additional services cost 3']!=''||order['Additional services 3']!=''
+                                                                              ? Row(
+                                                                                children: [
+                                                                                  Icon(Icons.note_add,color: const Color.fromARGB(255, 224, 58, 58)),
+                                                                                  SizedBox(width: Dimensions.widht5,),
+                                                                                  Text('${order['Additional services 3']} : ${order['Additional services cost 3']} ',style: TextStyle(fontSize: Dimensions.height15)),
+                                                                                ],
+                                                                              )
+                                                                              :SizedBox.shrink(),
+                                                                              SizedBox(height: Dimensions.height50,),
+                                                                              Row(
+                                                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                                                children: [
+                                                                                  // Icon(Icons.add,color: const Color.fromARGB(255, 224, 58, 58)),
+                                                                                  // SizedBox(width: Dimensions.widht5,),
+                                                                                  Text('Total Price: ${order['Total Service cost']}',style: TextStyle(fontSize: Dimensions.height17,fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 224, 58, 58))),
+                                                                                ],
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                            actions: [
+                                                                            TextButton(
+                                                                              onPressed: () {
+                                                                                Navigator.of(context).pop();
+                                                                              },
+                                                                              child: Text('Close',style: TextStyle(fontWeight: FontWeight.bold),),
+                                                                            ),
+                                                                          ],
+                                                                         );
+                                                                        }
+                                                                        else if (order['Service'] == 'Bellia Mart') {
+                                                                        return AlertDialog(
+                                                                          title: Container(
+                                                                            width: 10,
+                                                                            padding: EdgeInsets.all(5),
+                                                                            decoration: BoxDecoration(
+                                                                              color: Colors.black,
+                                                                              borderRadius: BorderRadius.circular(20),
+                                                                            ),
+                                                                            child: Center(
+                                                                              child: Text(
+                                                                                'Order Receipt',
+                                                                                style: TextStyle(
+                                                                                  fontWeight: FontWeight.bold,
+                                                                                  color: Colors.white,
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                          content: Column(
+                                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                            mainAxisSize: MainAxisSize.min,
+                                                                            children: [
+                                                                              SizedBox(height: Dimensions.height10),
+                                                                              StreamBuilder<QuerySnapshot>(
+                                                                                stream: FirebaseFirestore.instance
+                                                                                    .collection('orders')
+                                                                                    .doc("${FirebaseAuth.instance.currentUser?.email} - ${order['Date and Time']} - ${order['Service']}")
+                                                                                    .collection('cartItems')
+                                                                                    .snapshots(),
+                                                                                builder: (context, snapshot) {
+                                                                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                                    return const Center(child: CircularProgressIndicator());
+                                                                                  } else if (snapshot.hasError) {
+                                                                                    return const Center(child: Text('Error fetching data'));
+                                                                                  } else if (snapshot.data!.docs.isEmpty) {
+                                                                                    return const Center(child: Text('No items found'));
+                                                                                  } else {
+                                                                                    return Column(
+                                                                                      children: snapshot.data!.docs.map((doc) {
+                                                                                        var cartData = doc.data() as Map<String, dynamic>;
+                                                                                        return Padding(
+                                                                                          padding: EdgeInsets.symmetric(vertical: Dimensions.height5),
+                                                                                          child: Row(
+                                                                                            children: [
+                                                                                              Text("${cartData['AMOUNT']}X",style: TextStyle(fontWeight: FontWeight.bold,fontSize: Dimensions.height15,color: const Color.fromARGB(255, 224, 58, 58)),),
+                                                                                              SizedBox(width: Dimensions.widht10),
+                                                                                              Container(
+                                                                                                width: Dimensions.widht150,
+                                                                                                child: Text("${cartData['item']}",overflow: TextOverflow.ellipsis,style: TextStyle(fontSize: Dimensions.height12),)),
+                                                                                              SizedBox(width: Dimensions.widht20),
+                                                                                              Text("${cartData['Price']} LE",style: TextStyle(fontSize: Dimensions.height12)),
+                                                                                            ],
+                                                                                          ),
+                                                                                        );
+                                                                                      }).toList(),
+                                                                                    );
+                                                                                  }
+                                                                                },
+                                                                              ),
+                                                                              SizedBox(height: Dimensions.height50),
+                                                                              Row(
+                                                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                                                children: [
+                                                                                  // Icon(Icons.add, color: const Color.fromARGB(255, 224, 58, 58)),
+                                                                                  // SizedBox(width: Dimensions.widht15),
+                                                                                  Text(
+                                                                                    'Total Price: ${order['Total Service cost']}',
+                                                                                    style: TextStyle(fontSize: Dimensions.height15,fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 224, 58, 58)),
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                          actions: [
+                                                                            TextButton(
+                                                                              onPressed: () {
+                                                                                Navigator.of(context).pop();
+                                                                              },
+                                                                              child: Text(
+                                                                                'Close',
+                                                                                style: TextStyle(fontWeight: FontWeight.bold),
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        );
+                                                                      }
+                                                                       else if (order['Service'] == 'Car Maintenance') {
+                                                                        return AlertDialog(
+                                                                          title: Container(
+                                                                            width: 10,
+                                                                            padding: EdgeInsets.all(5),
+                                                                            decoration: BoxDecoration(
+                                                                              color: Colors.black,
+                                                                              borderRadius: BorderRadius.circular(20),
+                                                                            ),
+                                                                            child: Center(
+                                                                              child: Text(
+                                                                                'Order Receipt',
+                                                                                style: TextStyle(
+                                                                                  fontWeight: FontWeight.bold,
+                                                                                  color: Colors.white,
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                          content: Column(
+                                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                            mainAxisSize: MainAxisSize.min,
+                                                                            children: [
+                                                                              SizedBox(height: Dimensions.height10),
+                                                                              StreamBuilder<QuerySnapshot>(
+                                                                                stream: FirebaseFirestore.instance
+                                                                                    .collection('orders')
+                                                                                    .doc("${FirebaseAuth.instance.currentUser?.email} - ${order['Date and Time']} - ${order['Service']}")
+                                                                                    .collection('services')
+                                                                                    .snapshots(),
+                                                                                builder: (context, snapshot) {
+                                                                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                                    return const Center(child: CircularProgressIndicator());
+                                                                                  } else if (snapshot.hasError) {
+                                                                                    return const Center(child: Text('Error fetching data'));
+                                                                                  } else if (snapshot.data!.docs.isEmpty) {
+                                                                                    return const Center(child: Text('No items found'));
+                                                                                  } else {
+                                                                                    return Column(
+                                                                                      children: snapshot.data!.docs.map((doc) {
+                                                                                        var cartData = doc.data() as Map<String, dynamic>;
+                                                                                        return Padding(
+                                                                                          padding: EdgeInsets.symmetric(vertical: Dimensions.height5),
+                                                                                          child: Row(
+                                                                                            children: [
+                                                                                              Text("${cartData['task']}",style: TextStyle(fontWeight: FontWeight.bold,fontSize:Dimensions.height13,color: const Color.fromARGB(255, 224, 58, 58)),),
+                                                                                              // SizedBox(width: Dimensions.widht10),
+                                                                                              // Container(
+                                                                                              //   width: Dimensions.widht150,
+                                                                                              //   child: Text("${cartData['item']}",overflow: TextOverflow.ellipsis,style: TextStyle(fontSize:Dimensions.height12),)),
+                                                                                              SizedBox(width: Dimensions.widht20),
+                                                                                              Text("${cartData['price']} LE",style: TextStyle(fontSize:Dimensions.height12,fontWeight: FontWeight.bold)),
+                                                                                            ],
+                                                                                          ),
+                                                                                        );
+                                                                                      }).toList(),
+                                                                                    );
+                                                                                  }
+                                                                                },
+                                                                              ),
+                                                                              SizedBox(height: Dimensions.height50),
+                                                                              Row(
+                                                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                                                children: [
+                                                                                  // Icon(Icons.add, color: const Color.fromARGB(255, 224, 58, 58)),
+                                                                                  // SizedBox(width: Dimensions.widht15),
+                                                                                  Text(
+                                                                                    'Total Price: ${order['Service cost']}',
+                                                                                    style: TextStyle(fontSize: Dimensions.height15,fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 224, 58, 58)),
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                          actions: [
+                                                                            TextButton(
+                                                                              onPressed: () {
+                                                                                Navigator.of(context).pop();
+                                                                              },
+                                                                              child: Text(
+                                                                                'Close',
+                                                                                style: TextStyle(fontWeight: FontWeight.bold),
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        );
+                                                                      }
+                                                                        else {
+                                                                          return AlertDialog(
+                                                                            title: Text('Unknown Service'),
+                                                                            content: Text('Details about the service are not available.'),
+                                                                            actions: [
+                                                                              TextButton(
+                                                                                onPressed: () {
+                                                                                  Navigator.of(context).pop();
+                                                                                },
+                                                                                child: Text(
+                                                                                  'Close',
+                                                                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          );}
+                                                                      },
+                                                                    );
                                                                       },
                                                                       child:  Text(
                                                                         'View Receipt',
@@ -453,7 +946,7 @@ Stream<List<Map<String, dynamic>>> fetchOrderDataStream() {
                       ],
                     ),
                   )
-                  :Container();
+                  :SizedBox.shrink();
                 }
                 
               );

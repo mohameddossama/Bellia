@@ -13,7 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Checkout extends StatefulWidget {
   final String subAdministrativeArea;
   final String street;
-  late final List<Map<String, dynamic>> itemDetailsList;
+ List<Map<String, dynamic>> itemDetailsList;
   Checkout({
     super.key,
     required this.subAdministrativeArea,
@@ -78,90 +78,129 @@ class _CheckoutState extends State<Checkout> {
       FirebaseFirestore.instance.collection('Bellia Mart');
   CollectionReference orders = FirebaseFirestore.instance.collection("orders");
 
-  bool isLoading = false;
+ bool isLoading = false;
 
-  Future<void> addService() async {
-    try {
-      setState(() {
-        isLoading = true;
-      });
-
-      String _addLeadingZero(int number) {
-        return number < 10 ? '0$number' : '$number';
-      }
-
-      String getCurrentDateTimeString() {
-        DateTime now = DateTime.now();
-
-        String formattedDateTime =
-            '${now.year}-${_addLeadingZero(now.month)}-${_addLeadingZero(now.day)}  at '
-            '${_addLeadingZero(now.hour)}:${_addLeadingZero(now.minute)}:${_addLeadingZero(now.second)}';
-
-        return formattedDateTime;
-      }
-
-      String formattedDateTime = getCurrentDateTimeString();
-      String? userEmail = FirebaseAuth.instance.currentUser?.email;
-
-      DocumentReference userDocRef = belliaMart
-          .doc(userEmail! + " - " + formattedDateTime + " - " + 'Bellia Mart');
-
-      await userDocRef.set({
-        "User first name": fNameController.text,
-        "User last name": lNameController.text,
-        "Phone number": phoneController.text,
-        "Location": currentLocation.text,
-        "Land mark": landmarkController.text,
-        "Payment Method": payment,
-        "Status": statusController.text,
-        'Date and Time': formattedDateTime,
-        'Service': 'Bellia Mart',
-        'Confirmed Status': 'Processing',
-        'Estimated time of arrival':''
-      });
-
-      DocumentReference orderDocRef = orders
-          .doc(userEmail + " - " + formattedDateTime + " - " + 'Bellia Mart');
-      await orderDocRef.set({
-        "User first name": fNameController.text,
-        "User last name": lNameController.text,
-        "Phone number": phoneController.text,
-        "Location": currentLocation.text,
-        "Land mark": landmarkController.text,
-        "Payment Method": payment,
-        "Status": statusController.text,
-        'Date and Time': formattedDateTime,
-        'Service': 'Bellia Mart',
-        'Confirmed Status': 'Processing',
-        'Estimated time of arrival':''
-      });
-
-      for (var item in widget.itemDetailsList) {
-        await userDocRef.collection('cartItems').doc(item["itemName"]).set({
-          'item': item['itemName'],
-          'Price': item['itemPrice'],
-          'AMOUNT': item['itemCount'],
-        });
-        await orderDocRef.collection('cartItems').doc(item["itemName"]).set({
-          'item': item['itemName'],
-          'Price': item['itemPrice'],
-          'AMOUNT': item['itemCount'],
-        });
-      }
-
-      setState(() {
-        isLoading = false;
-      });
-
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => orderPage()));
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-      print("Error adding service: $e");
-    }
+  @override
+  void initState() {
+    super.initState();
+    fetchUserData();
+    getCache();
+    cacheCartItems(widget.itemDetailsList);
+    loadCartItems();
+    currentLocation.text = '${widget.subAdministrativeArea} ${widget.street}';
   }
+
+Future<void> addService() async {
+  try {
+    setState(() {
+      isLoading = true;
+    });
+
+    String _addLeadingZero(int number) {
+      return number < 10 ? '0$number' : '$number';
+    }
+
+    String getCurrentDateTimeString() {
+      DateTime now = DateTime.now();
+
+      String formattedDateTime =
+          '${now.year}-${_addLeadingZero(now.month)}-${_addLeadingZero(now.day)} at '
+          '${_addLeadingZero(now.hour)}:${_addLeadingZero(now.minute)}:${_addLeadingZero(now.second)}';
+
+      return formattedDateTime;
+    }
+
+    String formattedDateTime = getCurrentDateTimeString();
+    String? userEmail = FirebaseAuth.instance.currentUser?.email;
+
+    if (userEmail == null) {
+      throw Exception("User email is null");
+    }
+
+    // DocumentReference userDocRef = belliaMart
+    //     .doc("$userEmail - $formattedDateTime - Bellia Mart");
+
+    double totalPrice = 0.0;
+for (var item in widget.itemDetailsList) {
+  double itemPrice = 0.0;
+  if (item['itemPrice'] is String) {
+    itemPrice = double.tryParse(item['itemPrice']) ?? 0.0;
+  } else if (item['itemPrice'] is double) {
+    itemPrice = item['itemPrice'];
+  }
+  
+  int itemCount = 0;
+  if (item['itemCount'] is String) {
+    itemCount = int.tryParse(item['itemCount']) ?? 0;
+  } else if (item['itemCount'] is int) {
+    itemCount = item['itemCount'];
+  }
+  
+  totalPrice += itemPrice * itemCount;
+}
+DocumentReference userDocRef = belliaMart
+    .doc("$userEmail - $formattedDateTime - Bellia Mart");
+await userDocRef.set({
+  "User first name": fNameController.text,
+  "User last name": lNameController.text,
+  "Phone number": phoneController.text,
+  "Location": currentLocation.text,
+  "Land mark": landmarkController.text,
+  "Payment Method": payment,
+  "Status": statusController.text,
+  'Date and Time': formattedDateTime,
+  'Service': 'Bellia Mart',
+  'Confirmed Status': 'Processing',
+  'Estimated time of arrival': '',
+  'Total Service cost': '$totalPrice LE',
+});
+
+DocumentReference orderDocRef = orders
+    .doc("$userEmail - $formattedDateTime - Bellia Mart");
+await orderDocRef.set({
+  "User first name": fNameController.text,
+  "User last name": lNameController.text,
+  "Phone number": phoneController.text,
+  "Location": currentLocation.text,
+  "Land mark": landmarkController.text,
+  "Payment Method": payment,
+  "Status": statusController.text,
+  'Date and Time': formattedDateTime,
+  'Service': 'Bellia Mart',
+  'Confirmed Status': 'Processing',
+  'Estimated time of arrival': '',
+  'Total Service cost': '$totalPrice LE',
+});
+
+
+    for (var item in widget.itemDetailsList) {
+      await userDocRef.collection('cartItems').doc(item["itemName"]).set({
+        'item': item['itemName'],
+        'Price': item['itemPrice'],
+        'AMOUNT': item['itemCount'],
+      });
+      await orderDocRef.collection('cartItems').doc(item["itemName"]).set({
+        'item': item['itemName'],
+        'Price': item['itemPrice'],
+        'AMOUNT': item['itemCount'],
+      });
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => orderPage()),
+    );
+  } catch (e) {
+    setState(() {
+      isLoading = false;
+    });
+    print("Error adding service: $e");
+  }
+}
+
 
   void saveItemDetailsList(List<Map<String, dynamic>> itemDetailsList) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -169,7 +208,6 @@ class _CheckoutState extends State<Checkout> {
     prefs.setString('itemDetailsList', itemDetailsListJson);
   }
 
-// Retrieve itemDetailsList from SharedPreferences
   Future<List<Map<String, dynamic>>> getItemDetailsList() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? itemDetailsListJson = prefs.getString('itemDetailsList');
@@ -180,6 +218,25 @@ class _CheckoutState extends State<Checkout> {
       return itemDetailsList;
     }
     return [];
+  }
+
+  Future<void> cacheCartItems(List<Map<String, dynamic>> itemDetailsList) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String itemDetailsListJson = jsonEncode(itemDetailsList);
+    await prefs.setString('cartItems', itemDetailsListJson);
+  }
+
+  Future<void> loadCartItems() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? itemDetailsListJson = prefs.getString('cartItems');
+    if (itemDetailsListJson != null) {
+      final List<dynamic> decodedList = jsonDecode(itemDetailsListJson);
+      final List<Map<String, dynamic>> itemDetailsList =
+          List<Map<String, dynamic>>.from(decodedList);
+      setState(() {
+        widget.itemDetailsList = itemDetailsList;
+      });
+    }
   }
 
   getCache() async {
@@ -215,18 +272,10 @@ class _CheckoutState extends State<Checkout> {
     print('cache set');
   }
 
-  clearCache() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    await pref.clear();
-  }
-
   @override
-  void initState() {
-    super.initState();
-    fetchUserData();
-    //addService();
-    getCache();
-    currentLocation.text = '${widget.subAdministrativeArea} ${widget.street}';
+  void dispose() {
+    super.dispose();
+    setCache();
   }
 
   String payment = "cash";
@@ -246,7 +295,12 @@ class _CheckoutState extends State<Checkout> {
           ),
         ),
       ),
-      body: Container(
+      body: 
+      isLoading == true
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            :Container(
         margin: EdgeInsets.only(top: 20),
         padding: EdgeInsets.all(Dimensions.height10),
         child: Form(
@@ -601,7 +655,7 @@ class _CheckoutState extends State<Checkout> {
                 onPressed: () {
                   if (customerFormKey.currentState!.validate()) {
                     addService();
-                    clearCache();
+                    //clearCache();
                   }
                 },
                 style: FilledButton.styleFrom(
@@ -615,6 +669,10 @@ class _CheckoutState extends State<Checkout> {
                       fontWeight: FontWeight.bold),
                 ),
               ),
+            //   if (isLoading)
+            // Center(
+            //   child: CircularProgressIndicator(),
+            // ),
             ],
           ),
         ),

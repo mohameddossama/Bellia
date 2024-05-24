@@ -252,7 +252,9 @@ class _CarTowState extends State<CarTow> {
                     await reference
                         .doc(FirebaseAuth.instance.currentUser!.email! +
                             " - " +
-                            formattedDateTime + " - " + 'Car Towing')
+                            formattedDateTime +
+                            " - " +
+                            'Car Towing')
                         .set({
                       'Service': 'Car Towing',
                       'Car model': carModelController.text.trim(),
@@ -261,21 +263,23 @@ class _CarTowState extends State<CarTow> {
                       'Location': currentLocation.text.trim(),
                       'Land mark': additionalLocation.text.isNotEmpty
                           ? additionalLocation.text.trim()
-                          : " ",
+                          : "",
                       'Issue': issueController.text.isNotEmpty
                           ? issueController.text.trim()
-                          : " ",
+                          : "",
                       'Image link': urlDownload,
                       'Plate number': plateNumber.text,
                       'User first name': fNameController.text.trim(),
                       'User last name': lNameController.text.trim(),
                       'Status': 'Waiting confirmation',
-                      'Confirmed Status':'Processing',
+                      'Confirmed Status': 'Processing',
                       "Payment Method": '',
                       'Date and Time': formattedDateTime,
-                      'Estimated time of arrival':'',
-                      'Service cost':'',
-                        'Description(Optional)':'',
+                      'Estimated time of arrival': '',
+                      'Number of kilometers': '',
+                      'Single kilometer price': '20 LE',
+                      'Total Service cost': 'LE',
+                      'Description(Optional)': '',
                     });
                     if (_image != null) {
                       final path =
@@ -292,7 +296,9 @@ class _CarTowState extends State<CarTow> {
                     await reference2
                         .doc(FirebaseAuth.instance.currentUser!.email! +
                             " - " +
-                            formattedDateTime+ " - " + 'Car Towing')
+                            formattedDateTime +
+                            " - " +
+                            'Car Towing')
                         .set({
                       'Service': 'Car Towing',
                       'Date and Time': formattedDateTime,
@@ -302,23 +308,25 @@ class _CarTowState extends State<CarTow> {
                       'Location': currentLocation.text.trim(),
                       'Land mark': additionalLocation.text.isNotEmpty
                           ? additionalLocation.text.trim()
-                          : " ",
+                          : "",
                       'Issue': issueController.text.isNotEmpty
                           ? issueController.text.trim()
-                          : " ",
+                          : "",
                       'Image link': urlDownload,
                       'Plate number': plateNumber.text,
                       'User first name': fNameController.text.trim(),
                       'User last name': lNameController.text.trim(),
                       'Status': 'Waiting confirmation',
-                      'Confirmed Status':'Processing',
+                      'Confirmed Status': 'Processing',
                       "Payment Method": '',
-                      'Estimated time of arrival':'',
-                      'Service cost': '',
-                      'Description(Optional)':'',
+                      'Estimated time of arrival': '',
+                      'Number of kilometers': '',
+                      'Single kilometer price': '20',
+                      'Total Service cost': '',
+                      'Description(Optional)': '',
                     });
                     isLoading = false;
-                   clearCache();
+                    clearCache();
                     Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(builder: (context) => orderPage()),
                         (route) => false);
@@ -444,8 +452,8 @@ class _CarTowState extends State<CarTow> {
                       return null;
                     },
                     onChanged: (value) {
-                            setCache();
-                          },
+                      setCache();
+                    },
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
                       LengthLimitingTextInputFormatter(11),
@@ -593,8 +601,8 @@ class _CarTowState extends State<CarTow> {
                       return null;
                     },
                     onChanged: (_) {
-                            setCache();
-                          },
+                      setCache();
+                    },
                   ),
                   // const SizedBox(height: 16),
                   // Row(

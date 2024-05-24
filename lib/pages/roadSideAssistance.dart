@@ -260,10 +260,10 @@ class _RoadSideAssistanceState extends State<RoadSideAssistance> {
                       'Location': currentLocation.text.trim(),
                       'Land mark': additionalLocation.text.isNotEmpty
                           ? additionalLocation.text.trim()
-                          : " ",
+                          : "",
                       'Issue': issueController.text.isNotEmpty
                           ? issueController.text.trim()
-                          : " ",
+                          : "",
                       'Image link': urlDownload,
                       'Plate number': plateNumber.text,
                       'User first name': fNameController.text.trim(),
@@ -298,17 +298,28 @@ class _RoadSideAssistanceState extends State<RoadSideAssistance> {
                       'Location': currentLocation.text.trim(),
                       'Land mark': additionalLocation.text.isNotEmpty
                           ? additionalLocation.text.trim()
-                          : " ",
+                          : "",
                       'Issue': issueController.text.isNotEmpty
                           ? issueController.text.trim()
-                          : " ",
+                          : "",
                       'Image link': urlDownload,
                       'Plate number': plateNumber.text,
                       'User first name': fNameController.text.trim(),
                       'User last name': lNameController.text.trim(),
                       'Status': 'Waiting confirmation',
                       'Confirmed Status':'Processing',
-                      "Payment Method": ''
+                      "Payment Method": '',
+                      'Estimated time of arrival': '',
+                      'Number of kilometers': '',
+                      'Single kilometer price': '20 LE',
+                      'Total Service cost': 'LE',
+                      // 'Description(Optional)': '',
+                      'Additional services 1':'',
+                      'Additional services cost 1':'LE',
+                      'Additional services 2':'',
+                      'Additional services cost 2':'LE',
+                      'Additional services 3':'',
+                      'Additional services cost 3':'LE',
                     });
                     //isLoading = false;
                     setState(() {

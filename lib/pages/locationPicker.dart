@@ -62,7 +62,6 @@ class _location_picker_pageState extends State<location_picker_page> {
       );
 
       if (userMarker == null) {
-        // Add marker for user's location
         userMarker = Marker(
           markerId: const MarkerId("user_location"),
           position: LatLng(customer_lat!, customer_long!),
@@ -70,15 +69,14 @@ class _location_picker_pageState extends State<location_picker_page> {
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
         );
 
-        marks.add(userMarker!); // Add marker to the list
+        marks.add(userMarker!); 
       } else {
-        // Update marker position
         userMarker = userMarker!.copyWith(
           positionParam: LatLng(customer_lat!, customer_long!),
         );
       }
 
-      setState(() {}); // Update the UI to show the marker
+      setState(() {}); 
     }
   }
 
@@ -117,7 +115,7 @@ class _location_picker_pageState extends State<location_picker_page> {
     print("==================");
 
     if (mounted) {
-      // Check if the widget is still mounted before updating the state
+      
       setState(() {
         customer_long = position!.longitude;
         customer_lat = position!.latitude;
@@ -142,7 +140,7 @@ class _location_picker_pageState extends State<location_picker_page> {
   void dispose() {
     super.dispose();
     gm_controller
-        ?.dispose(); // Use the null-aware operator ?. to safely call dispose
+        ?.dispose(); 
   }
 
   @override

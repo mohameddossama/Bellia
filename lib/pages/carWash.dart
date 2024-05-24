@@ -24,7 +24,7 @@ class _CarWashState extends State<CarWash> {
   DateTime? selectedDatee;
   TimeOfDay? selectedTimee;
   String? currentLocation;
-  String currentTabName = 'Our Center';
+  String currentTabName = 'our center';
   bool isLoading = false;
   List<Map<String, String>> OurCenterpackages = [
     {
@@ -92,7 +92,7 @@ class _CarWashState extends State<CarWash> {
   }
 
   CollectionReference ourcenter =
-      FirebaseFirestore.instance.collection('car wash our center');
+      FirebaseFirestore.instance.collection('car wash: our center');
 
   Future<void> addUserc(BuildContext context) async {
     if (selectedPackageIndex != -1 &&
@@ -127,12 +127,13 @@ class _CarWashState extends State<CarWash> {
         'Status': 'Waiting confirmation',
         'Confirmed Status': 'Processing',
         "Payment Method": '',
+        'Description(Optional)':'',
         'id': FirebaseAuth.instance.currentUser?.email
       };
       String? userEmail = FirebaseAuth.instance.currentUser?.email;
 
       ourcenter
-          .doc(userEmail! + "  -  " + formattedDateTime)
+          .doc(userEmail! + " - " + formattedDateTime + " - " +'car wash: our center')
           .set(userData)
           .then((value) {
         print("User Added");
@@ -178,18 +179,19 @@ class _CarWashState extends State<CarWash> {
         'User last name': lName,
         'Phone number': mobile,
         'Date and Time': formattedDateTime,
-        "Service": "Car wash: $currentTabName",
+        "Service": "car wash: $currentTabName",
         'id': FirebaseAuth.instance.currentUser?.email,
         'Estimated time of arrival': '',
         'Status': 'Waiting confirmation',
         'Confirmed Status': 'Processing',
         "Payment Method": '',
+        'Description(Optional)':'',
       };
 
       String? userEmail = FirebaseAuth.instance.currentUser?.email;
 
       orders
-          .doc(userEmail! + " - " + formattedDateTime)
+          .doc((userEmail! + " - " + formattedDateTime + " - " +'car wash: our center'))
           .set(orderData)
           .then((value) {
         print("order Added");
@@ -206,7 +208,7 @@ class _CarWashState extends State<CarWash> {
   }
 
   CollectionReference yourplace =
-      FirebaseFirestore.instance.collection('car wash your place');
+      FirebaseFirestore.instance.collection('car wash: your place');
 
   Future<void> addUsery(BuildContext context) async {
     if (selectedPackageeIndex != -1 &&
@@ -225,6 +227,7 @@ class _CarWashState extends State<CarWash> {
         'Status': 'Waiting confirmation',
         'Confirmed Status': 'Processing',
         "Payment Method": '',
+        'Description(Optional)':'',
       };
 
       String _addLeadingZero(int number) {
@@ -244,7 +247,7 @@ class _CarWashState extends State<CarWash> {
       String formattedDateTime = getCurrentDateTimeString();
       String? userEmail = FirebaseAuth.instance.currentUser?.email;
       yourplace
-          .doc(userEmail! + "  -  " + formattedDateTime)
+          .doc(userEmail! + " - " + formattedDateTime + " - " +'car wash: your place')
           .set(userData)
           .then((value) {
         print("User Added");
@@ -296,14 +299,15 @@ class _CarWashState extends State<CarWash> {
         'Date and Time': formattedDateTime,
         'Customers location': currentLocation,
         'Additional location info': '',
-        "Service": "Car wash: $currentTabName",
+        "Service": "car wash: $currentTabName",
+        'Description(Optional)':'',
         'id': FirebaseAuth.instance.currentUser?.email
       };
 
       String? userEmail = FirebaseAuth.instance.currentUser?.email;
 
       orderss
-          .doc(userEmail! + " - " + formattedDateTime)
+          .doc(userEmail! + " - " + formattedDateTime + " - " +'car wash: your place')
           .set(orderData)
           .then((value) {
         print("order Added");
@@ -574,7 +578,7 @@ class _CarWashState extends State<CarWash> {
             ],
             onTap: (index) {
               setState(() {
-                currentTabName = index == 0 ? 'Our Center' : 'Your Place';
+                currentTabName = index == 0 ? 'our center' : 'your Place';
               });
             },
           ),

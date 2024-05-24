@@ -662,7 +662,7 @@ class _GarageState extends State<Garage> {
                         'Phone number': userData.mobileNumber,
                         'Package name': userData.selectedService,
                         'Number of weeks': userData.numberOfWeeks,
-                        'Price': userData.price,
+                        'Single Week Price': garageTasks[selectedCardIndex]['price'],
                         'Plate number': plateNumber.text,
                         'User first name': userData.firstName,
                         'User last name': userData.lastName,
@@ -671,7 +671,7 @@ class _GarageState extends State<Garage> {
                         'Date and Time': formattedDateTime,
                         'Location':'123 Ahmed Hamdy Street',
                         "Payment Method": '',
-                        'Service cost':userData.price,
+                        'Total Service cost':userData.price,
                         'Description(Optional)':userData.selectedService,
                       });
                       CollectionReference reference2 =
@@ -691,12 +691,12 @@ class _GarageState extends State<Garage> {
                         'User last name': lastNameController.text.trim(),
                         'Package name': userData.selectedService,
                         'Number of weeks': userData.numberOfWeeks,
-                        'Price': userData.price,
+                        'Single Week Price': "${garageTasks[selectedCardIndex]['price'].toString()} LE",
                         'Location':'123 Ahmed Hamdy Street',
                         'Status': 'Waiting confirmation',
                         'Confirmed Status':'Processing',
                         "Payment Method": '',
-                        'Service cost':userData.price,
+                        'Total Service cost':"${userData.price} LE",
                         'Description(Optional)':userData.selectedService,
                       });
                       isLoading = false;

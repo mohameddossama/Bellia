@@ -1,15 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-//import 'package:fluttercourse/pages/belliaMart.dart';
 import 'package:fluttercourse/pages/commerceHome.dart';
-//import 'package:fluttercourse/pages/belliaMart.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fluttercourse/pages/login.dart';
 import 'package:fluttercourse/util/imageUrlProvider.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 //import 'package:firebase_messaging/firebase_messaging.dart';
-//import 'package:fluttercourse/pages/maintenance.dart';
 import 'package:get/get.dart' ;
 
 

@@ -57,14 +57,11 @@ class _ChangePasswordState extends State<ChangePassword> {
         animType: AnimType.rightSlide,
         dialogType: DialogType.error,
         body: Center(
-          child: 
-          Container(
-             padding: EdgeInsets.all(10),
-            child: Text(
+          child: Text(
               'Failed to update password: Incorrect old password.',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-          ),
+          
         ),
         title: 'This is Ignored',
         desc: 'This is also Ignored',
@@ -234,7 +231,6 @@ class _ChangePasswordState extends State<ChangePassword> {
                         if (passwordFormKey.currentState!.validate()) {
                           confirmNewPassword();
                           onLoginPressed();
-                          // Navigate to the home page or perform any other actions
                         }
                       },
                       child: const Text(
