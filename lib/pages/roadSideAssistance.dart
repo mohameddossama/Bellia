@@ -251,7 +251,9 @@ class _RoadSideAssistanceState extends State<RoadSideAssistance> {
                     await reference
                         .doc(FirebaseAuth.instance.currentUser!.email! +
                             " - " +
-                            formattedDateTime + " - " + 'Roadside Assistance' )
+                            formattedDateTime +
+                            " - " +
+                            'Roadside Assistance')
                         .set({
                       'Service': 'Roadside Assistance',
                       'Car model': carModelController.text.trim(),
@@ -269,7 +271,7 @@ class _RoadSideAssistanceState extends State<RoadSideAssistance> {
                       'User first name': fNameController.text.trim(),
                       'User last name': lNameController.text.trim(),
                       'Status': 'Waiting confirmation',
-                      'Confirmed Status':'Processing',
+                      'Confirmed Status': 'Processing',
                       'Date and Time': formattedDateTime,
                       "Payment Method": ''
                     });
@@ -288,7 +290,9 @@ class _RoadSideAssistanceState extends State<RoadSideAssistance> {
                     await reference2
                         .doc(FirebaseAuth.instance.currentUser!.email! +
                             " - " +
-                            formattedDateTime + " - " + 'Roadside Assistance')
+                            formattedDateTime +
+                            " - " +
+                            'Roadside Assistance')
                         .set({
                       'Service': 'Roadside Assistance',
                       'Date and Time': formattedDateTime,
@@ -307,19 +311,19 @@ class _RoadSideAssistanceState extends State<RoadSideAssistance> {
                       'User first name': fNameController.text.trim(),
                       'User last name': lNameController.text.trim(),
                       'Status': 'Waiting confirmation',
-                      'Confirmed Status':'Processing',
+                      'Confirmed Status': 'Processing',
                       "Payment Method": '',
                       'Estimated time of arrival': '',
                       'Number of kilometers': '',
                       'Single kilometer price': '20 LE',
                       'Total Service cost': 'LE',
                       // 'Description(Optional)': '',
-                      'Additional services 1':'',
-                      'Additional services cost 1':'LE',
-                      'Additional services 2':'',
-                      'Additional services cost 2':'LE',
-                      'Additional services 3':'',
-                      'Additional services cost 3':'LE',
+                      'Additional services 1': TireReplacement == true?"Tire Replacement":"",
+                      'Additional services cost 1': 'LE',
+                      'Additional services 2': '',
+                      'Additional services cost 2': 'LE',
+                      'Additional services 3': '',
+                      'Additional services cost 3': 'LE',
                     });
                     //isLoading = false;
                     setState(() {
@@ -341,6 +345,10 @@ class _RoadSideAssistanceState extends State<RoadSideAssistance> {
       );
     }
   }
+
+  bool TireReplacement = false;
+  bool rodaina = false;
+  bool farah = false;
 
   @override
   Widget build(BuildContext context) {
@@ -738,6 +746,33 @@ class _RoadSideAssistanceState extends State<RoadSideAssistance> {
                     ),
                   ),
                   const SizedBox(height: 16),
+                  Column(children: [
+                    CheckboxListTile(
+                        title: Text("Tire Replacement"),
+                        value: TireReplacement,
+                        onChanged: (Val) {
+                          setState(() {
+                            TireReplacement = Val!;
+                          });
+                        }),
+                    CheckboxListTile(
+                        title: Text("rodaina"),
+                        value: rodaina,
+                        onChanged: (Val) {
+                          setState(() {
+                            rodaina = Val!;
+                          });
+                        }),
+                    CheckboxListTile(
+                        title: Text("farah"),
+                        value: farah,
+                        onChanged: (Val) {
+                          setState(() {
+                            farah = Val!;
+                          });
+                        }),
+                  ]),
+
                   TextFormField(
                     keyboardType: TextInputType.text,
                     controller: issueController,

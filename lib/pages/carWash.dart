@@ -3,7 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttercourse/pages/locationPicker.dart';
 import 'package:fluttercourse/pages/orders.dart';
+import 'package:fluttercourse/paymob/paymob_manager.dart';
+import 'package:fluttercourse/util/dimensions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CarWash extends StatefulWidget {
   final String subAdministrativeArea;
@@ -31,19 +34,19 @@ class _CarWashState extends State<CarWash> {
       "title": "Quick Shine",
       "subtitle":
           "Thorough exterior wash,\nWheel cleaning included,\nHand drying for spot-free finish",
-      "price": "30 EGP"
+      "price": "100"
     },
     {
       "title": "Shine & Detail",
       "subtitle":
           "Comprehensive exterior wash,\nHand-applied wax treatment for enhanced shine and protection,\nMeticulous interior detailing  including vacuuming, upholstery shampooing, and leather conditioning",
-      "price": "60 EGP"
+      "price": "150"
     },
     {
       "title": "Ultimate Cleanse",
       "subtitle":
           "Complete interior and exterior rejuvenation Exterior wash with ,\nHigh-quality products,\nThorough undercarriage wash",
-      "price": "100 EGP"
+      "price": "200"
     }
   ];
 
@@ -52,13 +55,13 @@ class _CarWashState extends State<CarWash> {
       "title": "On-the-Go Refresh",
       "subtitle":
           "Professional exterior wash at your doorstep ,\n Hand washing and drying ",
-      "price": "50 EGP"
+      "price": "100"
     },
     {
       "title": "VIP Mobile Spa",
       "subtitle":
-          "Comprehensive exterior and interior cleaning ,\n Includes interior vacuuming, window cleaning, and tire dressing",
-      "price": "80 EGP"
+          "Comprehensive exterior and interior cleaning,\nIncludes interior vacuming, window cleaning, and tire dressing",
+      "price": "200"
     },
   ];
 
@@ -127,13 +130,17 @@ class _CarWashState extends State<CarWash> {
         'Status': 'Waiting confirmation',
         'Confirmed Status': 'Processing',
         "Payment Method": '',
-        'Description(Optional)':'',
+        'Description(Optional)': '',
         'id': FirebaseAuth.instance.currentUser?.email
       };
       String? userEmail = FirebaseAuth.instance.currentUser?.email;
 
       ourcenter
-          .doc(userEmail! + " - " + formattedDateTime + " - " +'car wash: our center')
+          .doc(userEmail! +
+              " - " +
+              formattedDateTime +
+              " - " +
+              'car wash: our center')
           .set(userData)
           .then((value) {
         print("User Added");
@@ -185,13 +192,17 @@ class _CarWashState extends State<CarWash> {
         'Status': 'Waiting confirmation',
         'Confirmed Status': 'Processing',
         "Payment Method": '',
-        'Description(Optional)':'',
+        'Description(Optional)': '',
       };
 
       String? userEmail = FirebaseAuth.instance.currentUser?.email;
 
       orders
-          .doc((userEmail! + " - " + formattedDateTime + " - " +'car wash: our center'))
+          .doc((userEmail! +
+              " - " +
+              formattedDateTime +
+              " - " +
+              'car wash: our center'))
           .set(orderData)
           .then((value) {
         print("order Added");
@@ -227,7 +238,7 @@ class _CarWashState extends State<CarWash> {
         'Status': 'Waiting confirmation',
         'Confirmed Status': 'Processing',
         "Payment Method": '',
-        'Description(Optional)':'',
+        'Description(Optional)': '',
       };
 
       String _addLeadingZero(int number) {
@@ -247,7 +258,11 @@ class _CarWashState extends State<CarWash> {
       String formattedDateTime = getCurrentDateTimeString();
       String? userEmail = FirebaseAuth.instance.currentUser?.email;
       yourplace
-          .doc(userEmail! + " - " + formattedDateTime + " - " +'car wash: your place')
+          .doc(userEmail! +
+              " - " +
+              formattedDateTime +
+              " - " +
+              'car wash: your place')
           .set(userData)
           .then((value) {
         print("User Added");
@@ -285,29 +300,38 @@ class _CarWashState extends State<CarWash> {
 
       String formattedDateTime = getCurrentDateTimeString();
       Map<String, dynamic> orderData = {
-        'package_title': OurCenterpackages[selectedPackageeIndex]["title"],
-        'package_price': OurCenterpackages[selectedPackageeIndex]["price"],
+        'package_title': yourlocationpackages[selectedPackageeIndex]["title"],
+        'package_price': yourlocationpackages[selectedPackageeIndex]["price"],
         'date': selectedDatee!.toString(),
         'time': selectedTimee!.toString(),
         'User first name': fName,
         'User last name': lName,
         'Phone number': mobile,
+        'Car model': carModelController.text.trim(),
+        'Car brand': carNameController.text.trim(),
         'Estimated time of arrival': '',
         'Status': 'Waiting confirmation',
         'Confirmed Status': 'Processing',
         "Payment Method": '',
         'Date and Time': formattedDateTime,
-        'Customers location': currentLocation,
-        'Additional location info': '',
+        'Location': currentLocation,
+        'Land mark': additionalLocation.text.isNotEmpty
+            ? additionalLocation.text.trim()
+            : "",
+        'Plate number': plateNumber.text,
         "Service": "car wash: $currentTabName",
-        'Description(Optional)':'',
+        'Description(Optional)': '',
         'id': FirebaseAuth.instance.currentUser?.email
       };
 
       String? userEmail = FirebaseAuth.instance.currentUser?.email;
 
       orderss
-          .doc(userEmail! + " - " + formattedDateTime + " - " +'car wash: your place')
+          .doc(userEmail! +
+              " - " +
+              formattedDateTime +
+              " - " +
+              'car wash: your place')
           .set(orderData)
           .then((value) {
         print("order Added");
@@ -347,6 +371,21 @@ class _CarWashState extends State<CarWash> {
       _saveCache();
       setState(() {
         selectedTime = picked;
+      });
+    }
+  }
+
+    Future<void> _selectDatee(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDatee ?? DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 7)),
+    );
+    if (picked != null && picked != selectedDatee) {
+      _saveCache();
+      setState(() {
+        selectedDatee = picked;
       });
     }
   }
@@ -400,20 +439,6 @@ class _CarWashState extends State<CarWash> {
     }
   }
 
-  Future<void> _selectDatee(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selectedDatee ?? DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 7)),
-    );
-    if (picked != null && picked != selectedDatee) {
-      _saveCache();
-      setState(() {
-        selectedDatee = picked;
-      });
-    }
-  }
 
   void _submitt() {
     if (selectedPackageeIndex != -1 &&
@@ -462,9 +487,9 @@ class _CarWashState extends State<CarWash> {
         const SnackBar(
           content: Text(
             'Please select a package, date, and time.',
-            style: TextStyle(color: Color.fromARGB(255, 255, 20, 3)),
+            style: TextStyle(color: Colors.black),
           ),
-          backgroundColor: Colors.black,
+          //backgroundColor: Colors.black,
         ),
       );
     }
@@ -487,6 +512,7 @@ class _CarWashState extends State<CarWash> {
   void initState() {
     super.initState();
     fetchUserData();
+    fetchCars();
     currentLocation = '${widget.subAdministrativeArea} ${widget.street}';
     _loadCache();
   }
@@ -547,6 +573,60 @@ class _CarWashState extends State<CarWash> {
     await pref.clear();
   }
 
+  Future<void> _pay() async {
+    PaymobManager().payWithPaymob(300).then((String paymentKey) async {
+      final Uri paymob = Uri.parse(
+          'https://accept.paymob.com/api/acceptance/iframes/848430?payment_token=$paymentKey');
+      if (!await launchUrl(paymob)) {
+        throw 'Could not launch $paymob';
+      }
+    });
+  }
+
+  final TextEditingController additionalLocation = TextEditingController();
+  final TextEditingController carNameController = TextEditingController();
+  final TextEditingController carModelController = TextEditingController();
+  final TextEditingController plateNumber = TextEditingController();
+
+  Map<String, dynamic>? selectedCarData;
+  List<Map<String, dynamic>> carsList = [];
+
+  Future<void> fetchCars() async {
+    String? userEmail = FirebaseAuth.instance.currentUser?.email;
+    if (userEmail == null) {
+      print("No user logged in");
+      return;
+    }
+    QuerySnapshot carSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userEmail)
+        .collection('cars')
+        .get();
+
+    carsList = carSnapshot.docs
+        .map((doc) => doc.data() as Map<String, dynamic>)
+        .toList();
+
+    // if (carsList.isNotEmpty) {
+    //   selectedCarData = carsList[0];
+    //   updateTextFields();
+    // }
+    setState(() {});
+  }
+
+  void updateTextFields() {
+    if (selectedCarData != null) {
+      carNameController.text = selectedCarData!['car_brand'] ?? '';
+      carModelController.text = selectedCarData!['car_model'] ?? '';
+      // carColorController.text = selectedCarData!['car_color'] ?? '';
+      plateNumber.text = selectedCarData!['plate_number'] ?? '';
+    } else if (selectedCarData == null) {
+      carNameController.text = "";
+      carModelController.text = "";
+      plateNumber.text = "";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -564,7 +644,8 @@ class _CarWashState extends State<CarWash> {
           bottom: TabBar(
             indicatorColor: Color.fromARGB(255, 197, 181, 181),
             indicatorWeight: 5,
-            unselectedLabelStyle: TextStyle(fontSize: 9),
+            unselectedLabelStyle: TextStyle(
+                fontSize: Dimensions.height10, fontWeight: FontWeight.bold),
             labelColor: Color.fromARGB(255, 255, 246, 246),
             tabs: [
               Tab(
@@ -584,7 +665,7 @@ class _CarWashState extends State<CarWash> {
           ),
         ),
         body: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(15),
           child: TabBarView(
             children: [
               Column(
@@ -609,10 +690,266 @@ class _CarWashState extends State<CarWash> {
                               selectedPackageIndex = i;
                               _saveCache();
                             });
+                            Scaffold.of(context)
+                                .showBottomSheet((BuildContext context) {
+                              return Container(
+                                padding: EdgeInsets.all(Dimensions.height20),
+                                margin: EdgeInsets.all(0.5),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(
+                                            Dimensions.height20),
+                                        topRight: Radius.circular(
+                                            Dimensions.height20)),
+                                    color: Colors.grey[100],
+                                    border: Border.all(
+                                        color: Colors.black, width: 3)),
+                                width: 500,
+                                height: Dimensions.height500,
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      "Choose a car or register a new car",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18),
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(top: 10),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: const Color.fromARGB(
+                                              255, 224, 58, 58)),
+                                      child: Center(
+                                        child: DropdownButton<
+                                            Map<String, dynamic>>(
+                                          focusColor: Colors.black,
+                                          value: selectedCarData,
+                                          onChanged: (newValue) {
+                                            setState(() {
+                                              selectedCarData = newValue;
+                                              updateTextFields();
+                                            });
+                                          },
+                                          items: [
+                                            DropdownMenuItem<
+                                                Map<String, dynamic>>(
+                                              value: null,
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(
+                                                    Icons.car_repair,
+                                                    color: const Color.fromARGB(
+                                                        255, 0, 0, 0),
+                                                    size: 25,
+                                                  ),
+                                                  SizedBox(width: 10),
+                                                  Text(
+                                                    "Add a new car",
+                                                    style: TextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: const Color
+                                                            .fromARGB(
+                                                            255, 0, 0, 0)),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            ...carsList.map<
+                                                    DropdownMenuItem<
+                                                        Map<String, dynamic>>>(
+                                                (Map<String, dynamic> value) {
+                                              return DropdownMenuItem<
+                                                  Map<String, dynamic>>(
+                                                value: value,
+                                                child: Text(
+                                                  value['plate_number'] ??
+                                                      "Unknown Plate",
+                                                  style: TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color:
+                                                          const Color.fromARGB(
+                                                              255, 0, 0, 0)),
+                                                ),
+                                              );
+                                            }).toList(),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 20),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: TextFormField(
+                                            controller: carNameController,
+                                            textAlign: TextAlign.center,
+                                            decoration: InputDecoration(
+                                              hintText: 'Car Name',
+                                              border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(20.0),
+                                              ),
+                                              hintStyle: const TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            validator: (value) {
+                                              if (value == null ||
+                                                  value.isEmpty) {
+                                                return 'Please enter a car name';
+                                              }
+                                              return null;
+                                            },
+                                            onChanged: (_) {
+                                              //setCache();
+                                            },
+                                          ),
+                                        ),
+                                        const SizedBox(width: 16),
+                                        Expanded(
+                                          child: TextFormField(
+                                            controller: carModelController,
+                                            textAlign: TextAlign.center,
+                                            decoration: InputDecoration(
+                                              hintText: 'Car Model',
+                                              border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(20.0),
+                                              ),
+                                              hintStyle: const TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            validator: (value) {
+                                              if (value == null ||
+                                                  value.isEmpty) {
+                                                return 'Please enter a car model';
+                                              }
+                                              return null;
+                                            },
+                                            onChanged: (_) {
+                                              // setCache();
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 15),
+                                    TextFormField(
+                                      controller: plateNumber,
+                                      textAlign: TextAlign.center,
+                                      //keyboardType: TextInputType.te,
+                                      // inputFormatters: [
+                                      //   FilteringTextInputFormatter.allow(
+                                      //       RegExp(r'[A-Za-z0-9 ]')),
+                                      //   LengthLimitingTextInputFormatter(10),
+                                      // ],
+                                      decoration: InputDecoration(
+                                        hintText: 'Plate Number e.g., ABC-1234',
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(15.0),
+                                        ),
+                                        hintStyle: TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please enter the plate number';
+                                        }
+                                        RegExp plateExp =
+                                            RegExp(r'^[A-Za-z]{1,3}-?\d{1,4}$');
+                                        if (!plateExp.hasMatch(value)) {
+                                          return 'Enter a valid plate format (e.g., ABC-1234)';
+                                        }
+                                        return null;
+                                      },
+                                      onChanged: (_) {
+                                        //setCache();
+                                      },
+                                    ),
+                                    SizedBox(
+                                      height: Dimensions.height15,
+                                    ),
+                                    Container(
+                                      width: Dimensions.widht250,
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.black),
+                                        onPressed: () {
+                                          _selectDate(context);
+                                        },
+                                        child: Text(
+                                          selectedDate == null
+                                              ? 'Select Date'
+                                              : 'Date: ${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}',
+                                          style: TextStyle(
+                                              fontSize: Dimensions.height17,
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: Dimensions.height10),
+                                    Container(
+                                      width: Dimensions.widht250,
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.black),
+                                        onPressed: () {
+                                          _selectTime(context);
+                                        },
+                                        child: Text(
+                                          selectedTime == null
+                                              ? 'Select Time'
+                                              : 'Time: ${selectedTime!.hour}:${selectedTime!.minute}',
+                                          style: TextStyle(
+                                              fontSize: Dimensions.height17,
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                    // const SizedBox(height: 10),
+                                    // ElevatedButton(
+                                    //   onPressed: (){
+                                    //     Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const location_picker_page(service_name: "maintenance")));
+                                    //   },
+                                    //   child: const Text('Select Location'),
+                                    // ),
+
+                                    SizedBox(height: Dimensions.height45),
+                                    Container(
+                                      width: Dimensions.widht200,
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor: Color.fromARGB(
+                                                255, 224, 58, 58)),
+                                        onPressed: () {
+                                           //_pay();
+                                          _submitt;
+                                        },
+                                        child: Text(
+                                          'Submit',
+                                          style: TextStyle(
+                                              fontSize: Dimensions.height20,
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              );
+                            });
                           },
                           child: Container(
-                            margin: const EdgeInsets.symmetric(vertical: 10),
-                            padding: const EdgeInsets.all(20),
+                            margin: EdgeInsets.symmetric(
+                                vertical: Dimensions.height10),
+                            padding: EdgeInsets.all(Dimensions.height20),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(15),
                               color: selectedPackageIndex == i
@@ -630,7 +967,7 @@ class _CarWashState extends State<CarWash> {
                                       fontWeight: FontWeight.bold),
                                   textAlign: TextAlign.center,
                                 ),
-                                const SizedBox(height: 10),
+                                SizedBox(height: Dimensions.height10),
                                 Text(
                                   OurCenterpackages[i]["subtitle"] ??
                                       "Subtitle Not Available",
@@ -638,7 +975,7 @@ class _CarWashState extends State<CarWash> {
                                       fontSize: 16, color: Colors.black54),
                                   textAlign: TextAlign.center,
                                 ),
-                                const SizedBox(height: 10),
+                                SizedBox(height: Dimensions.height10),
                                 Text(
                                   OurCenterpackages[i]["price"] ??
                                       "price Not Available",
@@ -655,37 +992,41 @@ class _CarWashState extends State<CarWash> {
                       },
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      _selectDate(context);
-                    },
-                    child: Text(selectedDate == null
-                        ? 'Select Date'
-                        : 'Date: ${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}'),
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      _selectTime(context);
-                    },
-                    child: Text(selectedTime == null
-                        ? 'Select Time'
-                        : 'Time: ${selectedTime!.hour}:${selectedTime!.minute}'),
-                  ),
+                  //SizedBox(height: Dimensions.height20),
+                  // ElevatedButton(
+                  //   onPressed: () {
+                  //     _selectDate(context);
+                  //   },
+                  //   child: Text(selectedDate == null
+                  //       ? 'Select Date'
+                  //       : 'Date: ${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}'),
+                  // ),
                   // const SizedBox(height: 10),
                   // ElevatedButton(
-                  //   onPressed: (){
-                  //     Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const location_picker_page(service_name: "maintenance")));
+                  //   onPressed: () {
+                  //     _selectTime(context);
                   //   },
-                  //   child: const Text('Select Location'),
+                  //   child: Text(selectedTime == null
+                  //       ? 'Select Time'
+                  //       : 'Time: ${selectedTime!.hour}:${selectedTime!.minute}'),
                   // ),
-                  const SizedBox(height: 20),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _submit,
-                    child: const Text('Submit'),
-                  )
+                  // // const SizedBox(height: 10),
+                  // // ElevatedButton(
+                  // //   onPressed: (){
+                  // //     Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const location_picker_page(service_name: "maintenance")));
+                  // //   },
+                  // //   child: const Text('Select Location'),
+                  // // ),
+                  // const SizedBox(height: 20),
+                  // const SizedBox(height: 20),
+                  // ElevatedButton(
+                  //   // style: ButtonStyle(backgroundColor: ),
+                  //   onPressed: () {
+                  //     _pay();
+                  //     _submit;
+                  //   },
+                  //   child: const Text('Submit'),
+                  // )
                 ],
               ),
               Column(
@@ -699,7 +1040,7 @@ class _CarWashState extends State<CarWash> {
                         color: Colors.black),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: Dimensions.height25),
                   Expanded(
                     child: ListView.builder(
                       itemCount: yourlocationpackages.length,
@@ -709,11 +1050,423 @@ class _CarWashState extends State<CarWash> {
                             setState(() {
                               selectedPackageeIndex = i;
                               _saveCache();
+                              Scaffold.of(context)
+                                  .showBottomSheet((BuildContext context) {
+                                return SingleChildScrollView(
+                                  child: Container(
+                                    padding:
+                                        EdgeInsets.all(Dimensions.height20),
+                                    margin: EdgeInsets.all(0.5),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(
+                                                Dimensions.height20),
+                                            topRight: Radius.circular(
+                                                Dimensions.height20)),
+                                        color: Colors.grey[100],
+                                        border: Border.all(
+                                            color: Colors.black, width: 3)),
+                                    width: 500,
+                                    height:Dimensions.height665,
+                                    child: Column(
+                                      children: [
+                                        SingleChildScrollView(
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  SizedBox(
+                                                    width: Dimensions.widht5,
+                                                  ),
+                                                  Text(
+                                                    "Address",
+                                                    style: TextStyle(
+                                                        fontSize:
+                                                            Dimensions.height17,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: const Color
+                                                            .fromARGB(
+                                                            255, 0, 0, 0)),
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(
+                                                  height: Dimensions.height5),
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            25),
+                                                    border: Border.all(
+                                                        color: Colors.black,
+                                                        width: 0.5)),
+                                                width: Dimensions.widht350,
+                                                child: ElevatedButton(
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                          backgroundColor:
+                                                              const Color(
+                                                                  0xFFF2F2F6)),
+                                                  onPressed: () {
+                                                    Navigator.of(context)
+                                                        .pushReplacement(
+                                                            MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        location_picker_page(
+                                                                          service_name:
+                                                                              'wash',
+                                                                        )));
+                                                  },
+                                                  child: Text(
+                                                    maxLines: 2,
+                                                    currentLocation == null
+                                                        ? 'Select Location'
+                                                        : currentLocation!,
+                                                    style: TextStyle(
+                                                        fontSize:
+                                                            Dimensions.height17,
+                                                        color: const Color
+                                                            .fromARGB(
+                                                            255, 0, 0, 0)),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                  height: Dimensions.height20),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  SizedBox(
+                                                    width: Dimensions.widht5,
+                                                  ),
+                                                  Text(
+                                                    "LandMark (optional)",
+                                                    style: TextStyle(
+                                                        fontSize:
+                                                            Dimensions.height17,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: const Color
+                                                            .fromARGB(
+                                                            255, 0, 0, 0)),
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(
+                                                  height: Dimensions.height5),
+                                              TextFormField(
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                controller: additionalLocation,
+                                                textAlign: TextAlign.start,
+                                                maxLines: 1,
+                                                onChanged: (_) {
+                                                  //setCache();
+                                                },
+                                                decoration: InputDecoration(
+                                                  //contentPadding:EdgeInsets.only(top: 5),
+                                                  hintText:
+                                                      'Surrounding Landmarks',
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10.0),
+                                                  ),
+                                                  hintStyle: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                  height: Dimensions.height15),
+                                              Text(
+                                                "Choose a car or register a new car",
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18),
+                                              ),
+                                              Container(
+                                                margin:
+                                                    EdgeInsets.only(top: 10),
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    color: const Color.fromARGB(
+                                                        255, 224, 58, 58)),
+                                                child: Center(
+                                                  child: DropdownButton<
+                                                      Map<String, dynamic>>(
+                                                    focusColor: Colors.black,
+                                                    value: selectedCarData,
+                                                    onChanged: (newValue) {
+                                                      setState(() {
+                                                        selectedCarData =
+                                                            newValue;
+                                                        updateTextFields();
+                                                      });
+                                                    },
+                                                    items: [
+                                                      DropdownMenuItem<
+                                                          Map<String, dynamic>>(
+                                                        value: null,
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Icon(
+                                                              Icons.car_repair,
+                                                              color: const Color
+                                                                  .fromARGB(
+                                                                  255, 0, 0, 0),
+                                                              size: 25,
+                                                            ),
+                                                            SizedBox(width: 10),
+                                                            Text(
+                                                              "Add a new car",
+                                                              style: TextStyle(
+                                                                  fontSize: 18,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: const Color
+                                                                      .fromARGB(
+                                                                      255,
+                                                                      0,
+                                                                      0,
+                                                                      0)),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      ...carsList.map<
+                                                              DropdownMenuItem<
+                                                                  Map<String,
+                                                                      dynamic>>>(
+                                                          (Map<String, dynamic>
+                                                              value) {
+                                                        return DropdownMenuItem<
+                                                            Map<String,
+                                                                dynamic>>(
+                                                          value: value,
+                                                          child: Text(
+                                                            value['plate_number'] ??
+                                                                "Unknown Plate",
+                                                            style: TextStyle(
+                                                                fontSize: 18,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: const Color
+                                                                    .fromARGB(
+                                                                    255,
+                                                                    0,
+                                                                    0,
+                                                                    0)),
+                                                          ),
+                                                        );
+                                                      }).toList(),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 20),
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: TextFormField(
+                                                      controller:
+                                                          carNameController,
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      decoration:
+                                                          InputDecoration(
+                                                        hintText: 'Car Name',
+                                                        border:
+                                                            OutlineInputBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      20.0),
+                                                        ),
+                                                        hintStyle:
+                                                            const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                      ),
+                                                      validator: (value) {
+                                                        if (value == null ||
+                                                            value.isEmpty) {
+                                                          return 'Please enter a car name';
+                                                        }
+                                                        return null;
+                                                      },
+                                                      onChanged: (_) {
+                                                        //setCache();
+                                                      },
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 16),
+                                                  Expanded(
+                                                    child: TextFormField(
+                                                      controller:
+                                                          carModelController,
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      decoration:
+                                                          InputDecoration(
+                                                        hintText: 'Car Model',
+                                                        border:
+                                                            OutlineInputBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      20.0),
+                                                        ),
+                                                        hintStyle:
+                                                            const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                      ),
+                                                      validator: (value) {
+                                                        if (value == null ||
+                                                            value.isEmpty) {
+                                                          return 'Please enter a car model';
+                                                        }
+                                                        return null;
+                                                      },
+                                                      onChanged: (_) {
+                                                        // setCache();
+                                                      },
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 15),
+                                              TextFormField(
+                                                controller: plateNumber,
+                                                textAlign: TextAlign.center,
+                                                //keyboardType: TextInputType.te,
+                                                // inputFormatters: [
+                                                //   FilteringTextInputFormatter.allow(
+                                                //       RegExp(r'[A-Za-z0-9 ]')),
+                                                //   LengthLimitingTextInputFormatter(10),
+                                                // ],
+                                                decoration: InputDecoration(
+                                                  hintText:
+                                                      'Plate Number e.g., ABC-1234',
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15.0),
+                                                  ),
+                                                  hintStyle: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                validator: (value) {
+                                                  if (value == null ||
+                                                      value.isEmpty) {
+                                                    return 'Please enter the plate number';
+                                                  }
+                                                  RegExp plateExp = RegExp(
+                                                      r'^[A-Za-z]{1,3}-?\d{1,4}$');
+                                                  if (!plateExp
+                                                      .hasMatch(value)) {
+                                                    return 'Enter a valid plate format (e.g., ABC-1234)';
+                                                  }
+                                                  return null;
+                                                },
+                                                onChanged: (_) {
+                                                  //setCache();
+                                                },
+                                              ),
+                                              SizedBox(
+                                                height: Dimensions.height10,
+                                              ),
+                                              Container(
+                                                width: Dimensions.widht200,
+                                                child: ElevatedButton(
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                          backgroundColor:
+                                                              Colors.black),
+                                                  onPressed: () {
+                                                    _selectDatee(context);
+                                                    _saveCache();
+                                                  },
+                                                  child: Text(
+                                                    selectedDatee == null
+                                                        ? 'Select Date'
+                                                        : 'Date: ${selectedDatee!.day}/${selectedDatee!.month}/${selectedDatee!.year}',
+                                                    style: TextStyle(
+                                                        fontSize:
+                                                            Dimensions.height17,
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 10),
+                                              Container(
+                                                width: Dimensions.widht200,
+                                                child: ElevatedButton(
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                          backgroundColor:
+                                                              Colors.black),
+                                                  onPressed: () {
+                                                    _selectTimee(context);
+                                                    _saveCache();
+                                                  },
+                                                  child: Text(
+                                                    selectedTimee == null
+                                                        ? 'Select Time'
+                                                        : 'Time: ${selectedTimee!.hour}:${selectedTimee!.minute}',
+                                                    style: TextStyle(
+                                                        fontSize:
+                                                            Dimensions.height17,
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(height: Dimensions.height45),
+                                        Container(
+                                          width: Dimensions.widht200,
+                                          child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                                backgroundColor: Color.fromARGB(
+                                                    255, 224, 58, 58)),
+                                            onPressed: _submitt,
+                                            child: Text(
+                                              'Submit',
+                                              style: TextStyle(
+                                                  fontSize: Dimensions.height20,
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              });
                             });
                           },
                           child: Container(
-                            margin: const EdgeInsets.symmetric(vertical: 10),
-                            padding: const EdgeInsets.all(20),
+                            margin: EdgeInsets.symmetric(
+                                vertical: Dimensions.height20),
+                            padding: EdgeInsets.all(Dimensions.height20),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(15),
                               color: selectedPackageeIndex == i
@@ -756,44 +1509,6 @@ class _CarWashState extends State<CarWash> {
                       },
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      _selectDatee(context);
-                      _saveCache();
-                    },
-                    child: Text(selectedDatee == null
-                        ? 'Select Date'
-                        : 'Date: ${selectedDatee!.day}/${selectedDatee!.month}/${selectedDatee!.year}'),
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      _selectTimee(context);
-                      _saveCache();
-                    },
-                    child: Text(selectedTimee == null
-                        ? 'Select Time'
-                        : 'Time: ${selectedTimee!.hour}:${selectedTimee!.minute}'),
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pushReplacement(MaterialPageRoute(
-                          builder: (context) => location_picker_page(
-                                service_name: 'wash',
-                              )));
-                    },
-                    child: Text(currentLocation == null
-                        ? 'Select Location'
-                        : currentLocation!),
-                  ),
-                  const SizedBox(height: 20),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _submitt,
-                    child: Text('Submit'),
-                  )
                 ],
               ),
             ],

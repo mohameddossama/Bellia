@@ -44,7 +44,7 @@ List<Map<String, dynamic>> garageTasks = [
     'title': 'Bronze',
     'price': 500,
     'color':
-        Color.fromARGB(255, 114, 47, 25).withOpacity(0.6), // Adjusted color
+        Color.fromARGB(255, 114, 47, 25).withOpacity(0.6), 
     'imagePath': 'assets/icons/bronzem.png',
     'additionalText': [
       ' Car cover with a standard cover',
@@ -55,7 +55,6 @@ List<Map<String, dynamic>> garageTasks = [
   },
 ];
 
-// Define a class to represent user data
 class UserData {
   String firstName;
   String lastName;
@@ -65,7 +64,7 @@ class UserData {
   List<String> divingLicense;
   String numberOfWeeks;
   String selectedService;
-  double price;
+  int price;
 
   UserData({
     required this.firstName,
@@ -629,7 +628,7 @@ class _GarageState extends State<Garage> {
                             : ' ',
                         price: selectedCardIndex != -1
                             ? garageTasks[selectedCardIndex]['price'] *
-                                double.tryParse(selectedWeek)
+                                int.parse(selectedWeek)
                             : ' ',
                       );
                       String _addLeadingZero(int number) {
@@ -696,7 +695,7 @@ class _GarageState extends State<Garage> {
                         'Status': 'Waiting confirmation',
                         'Confirmed Status':'Processing',
                         "Payment Method": '',
-                        'Total Service cost':"${userData.price} LE",
+                        'Total Service cost':"${userData.price}",
                         'Description(Optional)':userData.selectedService,
                       });
                       isLoading = false;

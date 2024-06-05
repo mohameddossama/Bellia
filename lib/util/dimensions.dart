@@ -40,6 +40,7 @@ class Dimensions {
 
   static double height20 = screenHeight / 42.17142857142857;
   static double height200 = screenHeight / 4.217142857142857;
+  static double height250 = screenHeight /3.373714285714286;
   static double height10 = screenHeight / 84.34285714285714;
   static double height100 = screenHeight / 8.434285714285714;
   static double height5 = screenHeight / 168.6857142857143;
@@ -57,18 +58,26 @@ class Dimensions {
   static double height30 = screenHeight / 28.11428571428571;
   static double height390 = screenHeight / 2.162637362637363;
   static double height380 = screenHeight / 2.219548872180451;
+ static double height580 = screenHeight /  1.454187192118227;
   static double height320 = screenHeight / 2.635714285714286;
   static double height40 = screenHeight / 21.08571428571429;
   static double height400 = screenHeight / 2.108571428571429;
+ static double height500 = screenHeight / 1.686857142857143;
+   static double height480 = screenHeight /  1.757142857142857;
   static double height410 = screenHeight /2.057142857142857;
+ static double height450 = screenHeight / 1.874285714285714;
   static double height45 = screenHeight / 18.74285714285714;
   static double height350 = screenHeight / 2.409795918367347;
   static double height50 = screenHeight / 16.86857142857143;
   static double height300 = screenHeight / 2.811428571428571;
   static double height375 = screenHeight / 2.249142857142857;
+    static double height575 = screenHeight / 1.466832298136646;
   static double height35 = screenHeight / 24.09795918367347;
   static double height85 = screenHeight / 9.922689075630252;
   static double height600 = screenHeight / 1.405714285714286;
+  static double height605 = screenHeight / 1.39409681227863;
+   static double height665 = screenHeight / 1.268313641245972;
+   static double height565 = screenHeight /1.492793931731985;
   static double height150 = screenHeight / 5.622857142857143;
   static double aspectRatio = screenWidth / screenHeight * 1.4;
 }
