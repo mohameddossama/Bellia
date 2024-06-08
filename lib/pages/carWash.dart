@@ -5,6 +5,7 @@ import 'package:fluttercourse/pages/locationPicker.dart';
 import 'package:fluttercourse/pages/orders.dart';
 import 'package:fluttercourse/paymob/paymob_manager.dart';
 import 'package:fluttercourse/util/dimensions.dart';
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -129,7 +130,7 @@ class _CarWashState extends State<CarWash> {
         'Estimated time of arrival': '',
         'Status': 'Waiting confirmation',
         'Confirmed Status': 'Processing',
-        "Payment Method": '',
+        "Payment Method": 'Cash',
         'Description(Optional)': '',
         'id': FirebaseAuth.instance.currentUser?.email
       };
@@ -184,6 +185,9 @@ class _CarWashState extends State<CarWash> {
         'time': selectedTime!.toString(),
         'User first name': fName,
         'User last name': lName,
+        'Car model': carModelController.text.trim(),
+        'Car brand': carNameController.text.trim(),
+        'Plate number': plateNumber.text,
         'Phone number': mobile,
         'Date and Time': formattedDateTime,
         "Service": "car wash: $currentTabName",
@@ -191,7 +195,7 @@ class _CarWashState extends State<CarWash> {
         'Estimated time of arrival': '',
         'Status': 'Waiting confirmation',
         'Confirmed Status': 'Processing',
-        "Payment Method": '',
+        "Payment Method": 'Cash',
         'Description(Optional)': '',
       };
 
@@ -219,7 +223,7 @@ class _CarWashState extends State<CarWash> {
   }
 
   CollectionReference yourplace =
-      FirebaseFirestore.instance.collection('car wash: your place');
+      FirebaseFirestore.instance.collection('car wash: your Place');
 
   Future<void> addUsery(BuildContext context) async {
     if (selectedPackageeIndex != -1 &&
@@ -237,7 +241,7 @@ class _CarWashState extends State<CarWash> {
         'Estimated time of arrival': '',
         'Status': 'Waiting confirmation',
         'Confirmed Status': 'Processing',
-        "Payment Method": '',
+        "Payment Method": 'Cash',
         'Description(Optional)': '',
       };
 
@@ -262,7 +266,7 @@ class _CarWashState extends State<CarWash> {
               " - " +
               formattedDateTime +
               " - " +
-              'car wash: your place')
+              'car wash: your Place')
           .set(userData)
           .then((value) {
         print("User Added");
@@ -312,7 +316,7 @@ class _CarWashState extends State<CarWash> {
         'Estimated time of arrival': '',
         'Status': 'Waiting confirmation',
         'Confirmed Status': 'Processing',
-        "Payment Method": '',
+        "Payment Method": 'Cash',
         'Date and Time': formattedDateTime,
         'Location': currentLocation,
         'Land mark': additionalLocation.text.isNotEmpty
@@ -331,7 +335,7 @@ class _CarWashState extends State<CarWash> {
               " - " +
               formattedDateTime +
               " - " +
-              'car wash: your place')
+              'car wash: your Place')
           .set(orderData)
           .then((value) {
         print("order Added");
@@ -344,6 +348,21 @@ class _CarWashState extends State<CarWash> {
           backgroundColor: Colors.red,
         ),
       );
+    }
+  }
+
+  Future<void> _selectDatee(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDatee ?? DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 7)),
+    );
+    if (picked != null && picked != selectedDatee) {
+      _saveCache();
+      setState(() {
+        selectedDatee = picked;
+      });
     }
   }
 
@@ -371,21 +390,6 @@ class _CarWashState extends State<CarWash> {
       _saveCache();
       setState(() {
         selectedTime = picked;
-      });
-    }
-  }
-
-    Future<void> _selectDatee(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selectedDatee ?? DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 7)),
-    );
-    if (picked != null && picked != selectedDatee) {
-      _saveCache();
-      setState(() {
-        selectedDatee = picked;
       });
     }
   }
@@ -438,7 +442,6 @@ class _CarWashState extends State<CarWash> {
       );
     }
   }
-
 
   void _submitt() {
     if (selectedPackageeIndex != -1 &&
@@ -693,21 +696,39 @@ class _CarWashState extends State<CarWash> {
                             Scaffold.of(context)
                                 .showBottomSheet((BuildContext context) {
                               return Container(
-                                padding: EdgeInsets.all(Dimensions.height20),
+                                padding: EdgeInsets.all(Dimensions.height10),
                                 margin: EdgeInsets.all(0.5),
                                 decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(
-                                            Dimensions.height20),
-                                        topRight: Radius.circular(
-                                            Dimensions.height20)),
-                                    color: Colors.grey[100],
-                                    border: Border.all(
-                                        color: Colors.black, width: 3)),
+                                  borderRadius: BorderRadius.only(
+                                      topLeft:
+                                          Radius.circular(Dimensions.height20),
+                                      topRight:
+                                          Radius.circular(Dimensions.height20)),
+                                  color: Colors.grey[100],
+                                ),
                                 width: 500,
                                 height: Dimensions.height500,
                                 child: Column(
                                   children: [
+                                    Center(
+                                        child: Container(
+                                      height: Dimensions.height10,
+                                      width: Dimensions.widht45,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                          color: const Color.fromARGB(
+                                              255, 0, 0, 0)),
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor: const Color.fromARGB(255, 59, 57, 57)),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text(""),
+                                      ),
+                                    )),
+                                    SizedBox(height: Dimensions.height20,),
                                     Text(
                                       "Choose a car or register a new car",
                                       style: TextStyle(
@@ -930,8 +951,8 @@ class _CarWashState extends State<CarWash> {
                                             backgroundColor: Color.fromARGB(
                                                 255, 224, 58, 58)),
                                         onPressed: () {
-                                           //_pay();
-                                          _submitt;
+                                          //_pay();
+                                          _submit();
                                         },
                                         child: Text(
                                           'Submit',
@@ -1023,7 +1044,7 @@ class _CarWashState extends State<CarWash> {
                   //   // style: ButtonStyle(backgroundColor: ),
                   //   onPressed: () {
                   //     _pay();
-                  //     _submit;
+                  //     _submit();
                   //   },
                   //   child: const Text('Submit'),
                   // )
@@ -1055,24 +1076,44 @@ class _CarWashState extends State<CarWash> {
                                 return SingleChildScrollView(
                                   child: Container(
                                     padding:
-                                        EdgeInsets.all(Dimensions.height20),
+                                        EdgeInsets.all(Dimensions.height10),
                                     margin: EdgeInsets.all(0.5),
                                     decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(
-                                                Dimensions.height20),
-                                            topRight: Radius.circular(
-                                                Dimensions.height20)),
-                                        color: Colors.grey[100],
-                                        border: Border.all(
-                                            color: Colors.black, width: 3)),
+                                      borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(
+                                              Dimensions.height20),
+                                          topRight: Radius.circular(
+                                              Dimensions.height20)),
+                                      color: Colors.grey[100],
+                                    ),
                                     width: 500,
-                                    height:Dimensions.height665,
+                                    height: Dimensions.height665,
                                     child: Column(
                                       children: [
                                         SingleChildScrollView(
                                           child: Column(
                                             children: [
+                                              Center(
+                                                  child: Container(
+                                                height: Dimensions.height10,
+                                                width: Dimensions.widht45,
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            30),
+                                                    color: const Color.fromARGB(
+                                                        255, 0, 0, 0)),
+                                                child: ElevatedButton(
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                          backgroundColor:
+                                                               const Color.fromARGB(255, 59, 57, 57)),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  child: Text(""),
+                                                ),
+                                              )),
                                               Row(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.start,

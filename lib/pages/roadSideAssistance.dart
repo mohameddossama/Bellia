@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:fluttercourse/pages/commerceHome.dart';
 import 'package:fluttercourse/pages/locationPicker.dart';
 import 'package:fluttercourse/pages/orders.dart';
+import 'package:fluttercourse/util/dimensions.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -273,7 +274,7 @@ class _RoadSideAssistanceState extends State<RoadSideAssistance> {
                       'Status': 'Waiting confirmation',
                       'Confirmed Status': 'Processing',
                       'Date and Time': formattedDateTime,
-                      "Payment Method": ''
+                      "Payment Method": 'Cash'
                     });
                     if (_image != null) {
                       final path =
@@ -312,18 +313,25 @@ class _RoadSideAssistanceState extends State<RoadSideAssistance> {
                       'User last name': lNameController.text.trim(),
                       'Status': 'Waiting confirmation',
                       'Confirmed Status': 'Processing',
-                      "Payment Method": '',
+                      "Payment Method": 'Cash',
                       'Estimated time of arrival': '',
                       'Number of kilometers': '',
                       'Single kilometer price': '20 LE',
                       'Total Service cost': 'LE',
                       // 'Description(Optional)': '',
-                      'Additional services 1': TireReplacement == true?"Tire Replacement":"",
+                      'Additional services 1':
+                          TireReplacement == true ? "Tire Replacement" : "",
                       'Additional services cost 1': 'LE',
-                      'Additional services 2': '',
+                      'Additional services 2':
+                          FuelDelivery == true ? "Fuel Delivery" : "",
                       'Additional services cost 2': 'LE',
-                      'Additional services 3': '',
+                      'Additional services 3': BatteryReplacement == true
+                          ? "Battery Replacement"
+                          : "",
                       'Additional services cost 3': 'LE',
+                      'Additional services 4':
+                          LockoutService == true ? "Lockout Service" : "",
+                      'Additional services cost 4': 'LE',
                     });
                     //isLoading = false;
                     setState(() {
@@ -347,8 +355,9 @@ class _RoadSideAssistanceState extends State<RoadSideAssistance> {
   }
 
   bool TireReplacement = false;
-  bool rodaina = false;
-  bool farah = false;
+  bool FuelDelivery = false;
+  bool BatteryReplacement = false;
+  bool LockoutService = false;
 
   @override
   Widget build(BuildContext context) {
@@ -380,8 +389,9 @@ class _RoadSideAssistanceState extends State<RoadSideAssistance> {
         // physics: const NeverScrollableScrollPhysics(),
         children: [
           Container(
-            margin: const EdgeInsets.only(top: 30),
-            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
+            margin: EdgeInsets.only(top: Dimensions.height20),
+            padding: EdgeInsets.symmetric(
+                horizontal: Dimensions.height15, vertical: Dimensions.widht10),
             child: Form(
               key: _formKey,
               child: Column(
@@ -746,9 +756,19 @@ class _RoadSideAssistanceState extends State<RoadSideAssistance> {
                     ),
                   ),
                   const SizedBox(height: 16),
+                  Text(
+                    "Additional Services",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                  SizedBox(
+                    height: Dimensions.height5,
+                  ),
                   Column(children: [
                     CheckboxListTile(
-                        title: Text("Tire Replacement"),
+                        controlAffinity: ListTileControlAffinity.leading,
+                        activeColor: Color.fromARGB(255, 224, 58, 58),
+                        title: Text("Tire Replacement",
+                            style: TextStyle(fontWeight: FontWeight.bold)),
                         value: TireReplacement,
                         onChanged: (Val) {
                           setState(() {
@@ -756,23 +776,44 @@ class _RoadSideAssistanceState extends State<RoadSideAssistance> {
                           });
                         }),
                     CheckboxListTile(
-                        title: Text("rodaina"),
-                        value: rodaina,
+                        controlAffinity: ListTileControlAffinity.leading,
+                        activeColor: Color.fromARGB(255, 224, 58, 58),
+                        title: Text("Fuel Delivery",
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        value: FuelDelivery,
                         onChanged: (Val) {
                           setState(() {
-                            rodaina = Val!;
+                            FuelDelivery = Val!;
                           });
                         }),
                     CheckboxListTile(
-                        title: Text("farah"),
-                        value: farah,
+                        controlAffinity: ListTileControlAffinity.leading,
+                        activeColor: Color.fromARGB(255, 224, 58, 58),
+                        title: Text("Battery Replacement",
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        value: BatteryReplacement,
                         onChanged: (Val) {
                           setState(() {
-                            farah = Val!;
+                            BatteryReplacement = Val!;
+                          });
+                        }),
+                    CheckboxListTile(
+                        controlAffinity: ListTileControlAffinity.leading,
+                        activeColor: Color.fromARGB(255, 224, 58, 58),
+                        title: Text(
+                          "Lockout Service",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        value: LockoutService,
+                        onChanged: (Val) {
+                          setState(() {
+                            LockoutService = Val!;
                           });
                         }),
                   ]),
-
+                  SizedBox(
+                    height: Dimensions.height15,
+                  ),
                   TextFormField(
                     keyboardType: TextInputType.text,
                     controller: issueController,
@@ -782,7 +823,7 @@ class _RoadSideAssistanceState extends State<RoadSideAssistance> {
                       setCache();
                     },
                     decoration: InputDecoration(
-                      labelText: 'Issue (optional)',
+                      labelText: 'Specific Details or Requests',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
                       ),

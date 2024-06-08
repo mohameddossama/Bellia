@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:fluttercourse/pages/login.dart';
 import 'package:fluttercourse/util/imageUrlProvider.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 //import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart' ;
@@ -17,15 +18,24 @@ import 'package:get/get.dart' ;
 //   print("title: ${message..notification!.body}");
 //   // print("title: ${message.data}");
 // }
+late SharedPreferences pref;
+bool? firstLaunch;
 
 void main() async {
-   WidgetsFlutterBinding.ensureInitialized();
-   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform,);
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  pref = await SharedPreferences.getInstance();
+  firstLaunch = pref.getBool('firstLaunch') ?? true;
+  print('is first app launch? : $firstLaunch');
   // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  runApp(ChangeNotifierProvider(
+  runApp(
+    ChangeNotifierProvider(
       create: (_) => ImageUrlProvider(),
       child: MyApp(),
-    ),);
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {

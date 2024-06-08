@@ -6,7 +6,9 @@ import 'package:fluttercourse/pages/forgetPassword.dart';
 import 'package:fluttercourse/pages/register.dart';
 import 'package:fluttercourse/pages/commerceHome.dart';
 import 'package:fluttercourse/util/dimensions.dart';
+import 'package:fluttercourse/welcome_page.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class login_page extends StatefulWidget {
   const login_page({super.key});
@@ -113,6 +115,21 @@ class login_pageState extends State<login_page> {
             ],
           ),
         ),
+      );
+    }
+  }
+
+  Future<void> checkFirstLaunch() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    bool? firstLaunch = pref.getBool('firstLaunch');
+
+    if (firstLaunch == null || firstLaunch == true) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => WelcomePage()),
+      );
+    } else {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const CommerceHome()),
       );
     }
   }
@@ -261,10 +278,11 @@ class login_pageState extends State<login_page> {
                             )..show();
                           } else {
                             onLoginPressed();
-                            Navigator.of(context)
-                                .pushReplacement(MaterialPageRoute(
-                              builder: (context) => const CommerceHome(),
-                            ));
+                            await checkFirstLaunch();
+                            // Navigator.of(context)
+                            //     .pushReplacement(MaterialPageRoute(
+                            //   builder: (context) => const CommerceHome(),
+                            // ));
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               backgroundColor:
                                   const Color.fromARGB(255, 255, 255, 255),

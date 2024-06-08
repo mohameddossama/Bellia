@@ -197,7 +197,7 @@ class _MaintenanceState extends State<Maintenance> {
           "Plate number": plateNumber.text,
           'Date and Time': formattedDateTime,
           'Service': 'Car Maintenance',
-          "Payment Method": '',
+          "Payment Method": 'Cash',
           'Total Service cost':'',
         });
         DocumentReference orderDocRef =
@@ -216,7 +216,7 @@ class _MaintenanceState extends State<Maintenance> {
           "Plate number": plateNumber.text,
           'Date and Time': formattedDateTime,
           'Service': 'Car Maintenance',
-          "Payment Method": '',
+          "Payment Method": 'Cash',
           'Estimated time of arrival':'20 min',
           'Total Service cost':'',
         });

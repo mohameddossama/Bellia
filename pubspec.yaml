@@ -61,6 +61,7 @@ dependencies:
   flutter_bloc: ^8.1.5
   webview_flutter: ^4.8.0
   flutter_native_splash: ^2.4.0
+  introduction_screen: ^3.1.9
 dev_dependencies:
 
   flutter_launcher_icons: ^0.13.1

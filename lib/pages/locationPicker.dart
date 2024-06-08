@@ -1,4 +1,3 @@
-//import 'package:fluttercourse/pages/carWash.dart';
 import 'package:fluttercourse/pages/carTow.dart';
 import 'package:fluttercourse/pages/carWash.dart';
 import 'package:fluttercourse/pages/checkout.dart';
@@ -50,8 +49,13 @@ class _location_picker_pageState extends State<location_picker_page> {
 
   bool manuallyMoved = false;
   Marker? userMarker;
-  void _moveToUserLocation() {
-    if (mounted && customer_lat != null && customer_long != null) {
+
+  Future<void> _moveToUserLocation() async {
+    if (mounted) {
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      customer_lat = position.latitude;
+      customer_long = position.longitude;
+
       gm_controller?.animateCamera(
         CameraUpdate.newCameraPosition(
           CameraPosition(
@@ -61,6 +65,16 @@ class _location_picker_pageState extends State<location_picker_page> {
         ),
       );
 
+      List<Placemark> placemarks = await placemarkFromCoordinates(customer_lat!, customer_long!);
+      if (placemarks.isNotEmpty) {
+        country = placemarks[0].country;
+        administrativeArea = placemarks[0].administrativeArea;
+        subAdministrativeArea = placemarks[0].subAdministrativeArea;
+        street = placemarks[0].street;
+        locality = placemarks[0].locality;
+        subLocality = placemarks[0].subLocality;
+      }
+
       if (userMarker == null) {
         userMarker = Marker(
           markerId: const MarkerId("user_location"),
@@ -69,14 +83,14 @@ class _location_picker_pageState extends State<location_picker_page> {
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
         );
 
-        marks.add(userMarker!); 
+        marks.add(userMarker!);
       } else {
         userMarker = userMarker!.copyWith(
           positionParam: LatLng(customer_lat!, customer_long!),
         );
       }
 
-      setState(() {}); 
+      setState(() {});
     }
   }
 
@@ -132,15 +146,13 @@ class _location_picker_pageState extends State<location_picker_page> {
   @override
   void initState() {
     _determinePosition();
-
     super.initState();
   }
 
   @override
   void dispose() {
     super.dispose();
-    gm_controller
-        ?.dispose(); 
+    gm_controller?.dispose();
   }
 
   @override
@@ -154,21 +166,6 @@ class _location_picker_pageState extends State<location_picker_page> {
           ),
           backgroundColor: const Color.fromARGB(255, 224, 58, 58),
         ),
-        // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        // floatingActionButton: FloatingActionButton(
-        //   isExtended: true,
-        //   child: Text(
-        //     "Select Location",
-        //     style: TextStyle(color: Colors.white),
-        //     textAlign: TextAlign.center,
-        //   ),
-        //   backgroundColor: const Color.fromARGB(255, 224, 58, 58),
-        //   onPressed: () {
-        //     // if service name = "roadside assistance" then navigate to roadside assistance service page
-        //     // if service name = "e-store" then navigate to roadside customer info page
-        //     // if service name = "car wash" then navigate to car wash service page
-        //   },
-        // ),
         body: Stack(
           children: [
             GoogleMap(

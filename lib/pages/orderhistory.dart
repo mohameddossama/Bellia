@@ -23,7 +23,7 @@ class Orderhistory extends StatefulWidget {
 class _OrderhistoryState extends State<Orderhistory> {
   late Stream<List<Map<String, dynamic>>> orderDataStream;
 
-  String service_name = "e-store";
+  String service_name = "garage";
   double bellia_long = 29.909494;
   double bellia_lat = 31.208805;
   double garage_long = 30.005420;
@@ -187,7 +187,7 @@ class _OrderhistoryState extends State<Orderhistory> {
       List<String> options = [
         'Roadside Assistance',
         'car wash: our center',
-        'car wash: your place',
+        'car wash: your Place',
         'Car Towing',
         'Bellia Mart',
         'Garage',
@@ -277,7 +277,8 @@ class _OrderhistoryState extends State<Orderhistory> {
                             ? Container(
                                 padding: EdgeInsets.all(Dimensions.height5),
                                 margin: EdgeInsets.only(
-                                    top: Dimensions.height12,
+                                    top: Dimensions.height10,
+                                    bottom: Dimensions.height5,
                                     left: 8,
                                     right: 8),
                                 height: Dimensions.height130,
@@ -382,13 +383,25 @@ class _OrderhistoryState extends State<Orderhistory> {
                                                                     'Service'] ==
                                                                 'Garage'
                                                             ? Dimensions
-                                                                .height580
-                                                            : order['Service'] ==
-                                                                    'car wash: your Place'
+                                                                .height605
+                                                            :order['Service'] ==
+                                                                    'Car Maintenance'
                                                                 ? Dimensions
-                                                                    .height605
-                                                                : Dimensions
-                                                                    .height575,
+                                                                    .height570
+                                                                :order['Service'] ==
+                                                                    'car wash: our center'
+                                                                  ?Dimensions
+                                                                    .height570
+                                                                 :order['Service'] ==
+                                                                    'Roadside Assistance'
+                                                                    ?Dimensions
+                                                                    .height595
+                                                                 :order['Service'] ==
+                                                                    'Bellia Mart'
+                                                                    ?Dimensions
+                                                                    .height540
+                                                                    :Dimensions
+                                                                    .height595,
                                                         width:
                                                             Dimensions.widht500,
                                                         padding: EdgeInsets.all(
@@ -399,6 +412,43 @@ class _OrderhistoryState extends State<Orderhistory> {
                                                               CrossAxisAlignment
                                                                   .start,
                                                           children: [
+                                                            Center(
+                                                                child:
+                                                                    Container(
+                                                              height: Dimensions
+                                                                  .height10,
+                                                              width: Dimensions
+                                                                  .widht45,
+                                                              decoration: BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              30),
+                                                                  color: const Color
+                                                                      .fromARGB(
+                                                                      255,
+                                                                      0,
+                                                                      0,
+                                                                      0)),
+                                                              child:
+                                                                  ElevatedButton(
+                                                                style: ElevatedButton.styleFrom(
+                                                                    backgroundColor:
+                                                                        const Color
+                                                                            .fromARGB(
+                                                                            255,
+                                                                            59,
+                                                                            57,
+                                                                            57)),
+                                                                onPressed: () {
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop();
+                                                                },
+                                                                child: Text(""),
+                                                              ),
+                                                            )),
+                                                            SizedBox(height: Dimensions.height17,),
                                                             Center(
                                                               //crossAxisAlignment: CrossAxisAlignment.start,
                                                               child: Container(
@@ -925,7 +975,7 @@ class _OrderhistoryState extends State<Orderhistory> {
                                                             ),
                                                             SizedBox(
                                                               height: Dimensions
-                                                                  .height10,
+                                                                  .height18,
                                                             ),
                                                             order['Status'] ==
                                                                     'Completed'
@@ -1011,6 +1061,15 @@ class _OrderhistoryState extends State<Orderhistory> {
                                                                                           SizedBox(
                                                                                             height: Dimensions.height5,
                                                                                           ),
+                                                                                          Row(
+                                                                                            mainAxisAlignment: MainAxisAlignment.end,
+                                                                                            children: [
+                                                                                              Text('Payment Method: ${order['Payment Method']}', style: TextStyle(fontSize: Dimensions.height13, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 224, 58, 58))),
+                                                                                            ],
+                                                                                          ),
+                                                                                          SizedBox(
+                                                                                            height: Dimensions.height5,
+                                                                                          ),
                                                                                           order['Status'] == 'Completed'
                                                                                               ? Row(
                                                                                                   mainAxisAlignment: MainAxisAlignment.end,
@@ -1090,6 +1149,15 @@ class _OrderhistoryState extends State<Orderhistory> {
                                                                                               // SizedBox(width: Dimensions.widht5,),
                                                                                               Text('Total Price: ${order['Total Service cost']}', style: TextStyle(fontSize: Dimensions.height17, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 224, 58, 58))),
                                                                                             ],
+                                                                                          ),
+                                                                                          Row(
+                                                                                            mainAxisAlignment: MainAxisAlignment.end,
+                                                                                            children: [
+                                                                                              Text('Payment Method: ${order['Payment Method']}', style: TextStyle(fontSize: Dimensions.height13, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 224, 58, 58))),
+                                                                                            ],
+                                                                                          ),
+                                                                                          SizedBox(
+                                                                                            height: Dimensions.height5,
                                                                                           ),
                                                                                         ],
                                                                                       ),
@@ -1204,6 +1272,15 @@ class _OrderhistoryState extends State<Orderhistory> {
                                                                                               Text('Total Price: ${order['Total Service cost']}', style: TextStyle(fontSize: Dimensions.height17, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 224, 58, 58))),
                                                                                             ],
                                                                                           ),
+                                                                                          Row(
+                                                                                            mainAxisAlignment: MainAxisAlignment.end,
+                                                                                            children: [
+                                                                                              Text('Payment Method: ${order['Payment Method']}', style: TextStyle(fontSize: Dimensions.height13, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 224, 58, 58))),
+                                                                                            ],
+                                                                                          ),
+                                                                                          SizedBox(
+                                                                                            height: Dimensions.height5,
+                                                                                          ),
                                                                                         ],
                                                                                       ),
                                                                                       actions: [
@@ -1294,6 +1371,15 @@ class _OrderhistoryState extends State<Orderhistory> {
                                                                                               ),
                                                                                             ],
                                                                                           ),
+                                                                                          Row(
+                                                                                            mainAxisAlignment: MainAxisAlignment.end,
+                                                                                            children: [
+                                                                                              Text('Payment Method: ${order['Payment Method']}', style: TextStyle(fontSize: Dimensions.height13, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 224, 58, 58))),
+                                                                                            ],
+                                                                                          ),
+                                                                                          SizedBox(
+                                                                                            height: Dimensions.height5,
+                                                                                          ),
                                                                                         ],
                                                                                       ),
                                                                                       actions: [
@@ -1380,6 +1466,15 @@ class _OrderhistoryState extends State<Orderhistory> {
                                                                                               ),
                                                                                             ],
                                                                                           ),
+                                                                                          Row(
+                                                                                            mainAxisAlignment: MainAxisAlignment.end,
+                                                                                            children: [
+                                                                                              Text('Payment Method: ${order['Payment Method']}', style: TextStyle(fontSize: Dimensions.height13, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 224, 58, 58))),
+                                                                                            ],
+                                                                                          ),
+                                                                                          SizedBox(
+                                                                                            height: Dimensions.height5,
+                                                                                          ),
                                                                                         ],
                                                                                       ),
                                                                                       actions: [
@@ -1394,7 +1489,79 @@ class _OrderhistoryState extends State<Orderhistory> {
                                                                                         ),
                                                                                       ],
                                                                                     );
-                                                                                  } else {
+                                                                                  }else if (order['Service'] == 'car wash: your Place' || order['Service'] == 'car wash: our center') {
+                                                                                  return AlertDialog(
+                                                                                    title: Container(
+                                                                                        width: 10,
+                                                                                        padding: EdgeInsets.all(5),
+                                                                                        decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(20)),
+                                                                                        child: Center(
+                                                                                            child: Text(
+                                                                                          'Order Receipt',
+                                                                                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                                                                                        ))),
+                                                                                    content: Column(
+                                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                                      mainAxisSize: MainAxisSize.min,
+                                                                                      children: [
+                                                                                        SizedBox(
+                                                                                          height: Dimensions.height10,
+                                                                                        ),
+                                                                                        Row(
+                                                                                          children: [
+                                                                                            Icon(Icons.wallet_giftcard, color: const Color.fromARGB(255, 224, 58, 58)),
+                                                                                            SizedBox(
+                                                                                              width: Dimensions.widht5,
+                                                                                            ),
+                                                                                            Text('Package Name: ${order['package_title']}', style: TextStyle(fontSize: Dimensions.height13, fontWeight: FontWeight.bold)),
+                                                                                          ],
+                                                                                        ),
+                                                                                        SizedBox(
+                                                                                          height: Dimensions.height10,
+                                                                                        ),
+                                                                                        Row(
+                                                                                          children: [
+                                                                                            Icon(Icons.attach_money_rounded, color: const Color.fromARGB(255, 224, 58, 58)),
+                                                                                            SizedBox(
+                                                                                              width: Dimensions.widht5,
+                                                                                            ),
+                                                                                            Text('Package Price: ${order['package_price']}', style: TextStyle(fontSize: Dimensions.height13, fontWeight: FontWeight.bold)),
+                                                                                          ],
+                                                                                        ),
+                                                                                        SizedBox(
+                                                                                          height: Dimensions.height50,
+                                                                                        ),
+                                                                                        Row(
+                                                                                          mainAxisAlignment: MainAxisAlignment.end,
+                                                                                          children: [
+                                                                                            // Icon(Icons.add,color: const Color.fromARGB(255, 224, 58, 58)),
+                                                                                            // SizedBox(width: Dimensions.widht5,),
+                                                                                            Text('Total Price: ${order['package_price']} LE', style: TextStyle(fontSize: Dimensions.height17, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 224, 58, 58))),
+                                                                                          ],
+                                                                                        ),
+                                                                                        Row(
+                                                                                            mainAxisAlignment: MainAxisAlignment.end,
+                                                                                            children: [
+                                                                                              Text('Payment Method: ${order['Payment Method']}', style: TextStyle(fontSize: Dimensions.height13, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 224, 58, 58))),
+                                                                                            ],
+                                                                                          ),
+                                                                                         
+                                                                                      ],
+                                                                                    ),
+                                                                                    actions: [
+                                                                                      TextButton(
+                                                                                        onPressed: () {
+                                                                                          Navigator.of(context).pop();
+                                                                                        },
+                                                                                        child: Text(
+                                                                                          'Close',
+                                                                                          style: TextStyle(fontWeight: FontWeight.bold),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ],
+                                                                                  );
+                                                                                } else {
                                                                                     return AlertDialog(
                                                                                       title: Text('Unknown Service'),
                                                                                       content: Text('Details about the service are not available.'),

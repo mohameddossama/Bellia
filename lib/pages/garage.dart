@@ -694,7 +694,8 @@ class _GarageState extends State<Garage> {
                         'Location':'123 Ahmed Hamdy Street',
                         'Status': 'Waiting confirmation',
                         'Confirmed Status':'Processing',
-                        "Payment Method": '',
+                        "Payment Method": 'Cash',
+                        'Estimated time of arrival':'',
                         'Total Service cost':"${userData.price}",
                         'Description(Optional)':userData.selectedService,
                       });

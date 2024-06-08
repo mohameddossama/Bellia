@@ -5,8 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttercourse/pages/commerceHome.dart';
-import 'package:fluttercourse/pages/orderDetails.dart';
-import 'package:fluttercourse/pages/order_details.dart';
 import 'package:fluttercourse/paymob/paymob_manager.dart';
 import 'package:fluttercourse/util/dimensions.dart';
 import 'package:geolocator/geolocator.dart';
@@ -24,7 +22,7 @@ class orderPage extends StatefulWidget {
 class _OrderPageState extends State<orderPage> {
   late Stream<List<Map<String, dynamic>>> orderDataStream;
 
-  String service_name = "e-store";
+  String service_name = "garage";
   double bellia_long = 29.909494;
   double bellia_lat = 31.208805;
   double garage_long = 30.005420;
@@ -188,7 +186,7 @@ class _OrderPageState extends State<orderPage> {
       List<String> options = [
         'Roadside Assistance',
         'car wash: our center',
-        'car wash: your place',
+        'car wash: your Place',
         'Car Towing',
         'Bellia Mart',
         'Garage',
@@ -296,8 +294,8 @@ class _OrderPageState extends State<orderPage> {
                                 order['Status'] == 'Confirmed'
                             ? Container(
                                 padding: EdgeInsets.all(Dimensions.height5),
-                                margin: const EdgeInsets.only(
-                                    top: 15, left: 8, right: 8),
+                                margin:  EdgeInsets.only(
+                                    top: Dimensions.height10,bottom: Dimensions.height5, left: 8, right: 8),
                                 height: Dimensions.height130,
                                 decoration: BoxDecoration(
                                   color: Colors.white,
@@ -399,12 +397,22 @@ class _OrderPageState extends State<orderPage> {
                                                             (BuildContext
                                                                 context) {
                                                       return Container(
-                                                        height:
-                                                            order['Service']=='Garage'
-                                                            ?Dimensions.height580
-                                                            :order['Service']=='car wash: your Place'
-                                                            ?Dimensions.height605
-                                                            :Dimensions.height565,
+                                                        height: order[
+                                                                    'Service'] ==
+                                                                'Garage'
+                                                            ? Dimensions
+                                                                .height585
+                                                            : order['Service'] ==
+                                                                    'car wash: your Place'
+                                                                ? Dimensions
+                                                                    .height610
+                                                                : order['Service'] ==
+                                                                    'Car Maintenance'||order['Service'] ==
+                                                                    'Bellia Mart'
+                                                                ?Dimensions
+                                                                    .height550
+                                                                :Dimensions
+                                                                    .height585,
                                                         width:
                                                             Dimensions.widht500,
                                                         padding: EdgeInsets.all(
@@ -415,6 +423,43 @@ class _OrderPageState extends State<orderPage> {
                                                               CrossAxisAlignment
                                                                   .start,
                                                           children: [
+                                                            Center(
+                                                                child:
+                                                                    Container(
+                                                              height: Dimensions
+                                                                  .height10,
+                                                              width: Dimensions
+                                                                  .widht45,
+                                                              decoration: BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              30),
+                                                                  color: const Color
+                                                                      .fromARGB(
+                                                                      255,
+                                                                      0,
+                                                                      0,
+                                                                      0)),
+                                                              child:
+                                                                  ElevatedButton(
+                                                                style: ElevatedButton.styleFrom(
+                                                                    backgroundColor:
+                                                                        const Color
+                                                                            .fromARGB(
+                                                                            255,
+                                                                            59,
+                                                                            57,
+                                                                            57)),
+                                                                onPressed: () {
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop();
+                                                                },
+                                                                child: Text(""),
+                                                              ),
+                                                            )),
+                                                            SizedBox(height: Dimensions.height17,),
                                                             Center(
                                                               //crossAxisAlignment: CrossAxisAlignment.start,
                                                               child: Container(
@@ -562,9 +607,8 @@ class _OrderPageState extends State<orderPage> {
                                                                         ],
                                                                       ),
                                                                 SizedBox(
-                                                                  height:
-                                                                      Dimensions
-                                                                          .height10,
+                                                                  height: Dimensions
+                                                                      .height10,
                                                                 ),
                                                                 Row(
                                                                   children: [
@@ -646,8 +690,11 @@ class _OrderPageState extends State<orderPage> {
                                                               height: Dimensions
                                                                   .height10,
                                                             ),
-                                                            order['Service'] =='car wash: your Place'||order['Service'] =='car wash: our center'
-                                                            ?Row(
+                                                            order['Service'] ==
+                                                                        'car wash: your Place' ||
+                                                                    order['Service'] ==
+                                                                        'car wash: our center'
+                                                                ? Row(
                                                                     children: [
                                                                       Row(
                                                                         children: [
@@ -662,7 +709,7 @@ class _OrderPageState extends State<orderPage> {
                                                                             order['package_title'] ??
                                                                                 '',
                                                                             style:
-                                                                                TextStyle(fontWeight: FontWeight.bold,fontSize: Dimensions.height13),
+                                                                                TextStyle(fontWeight: FontWeight.bold, fontSize: Dimensions.height13),
                                                                           ),
                                                                           // SizedBox(
                                                                           //   width:
@@ -703,15 +750,23 @@ class _OrderPageState extends State<orderPage> {
                                                                             '',
                                                                         style: TextStyle(
                                                                             fontWeight:
-                                                                                FontWeight.bold,fontSize: Dimensions.height13),
+                                                                                FontWeight.bold,
+                                                                            fontSize: Dimensions.height13),
                                                                       ),
                                                                     ],
                                                                   )
-
-                                                            :SizedBox.shrink(),
-                                                            order['Service'] =='car wash: your Place'||order['Service'] =='car wash: our center'
-                                                            ?SizedBox(height: Dimensions.height10,)
-                                                            :SizedBox.shrink(),
+                                                                : SizedBox
+                                                                    .shrink(),
+                                                            order['Service'] ==
+                                                                        'car wash: your Place' ||
+                                                                    order['Service'] ==
+                                                                        'car wash: our center'
+                                                                ? SizedBox(
+                                                                    height: Dimensions
+                                                                        .height10,
+                                                                  )
+                                                                : SizedBox
+                                                                    .shrink(),
                                                             Row(
                                                               children: [
                                                                 Text(
@@ -997,27 +1052,33 @@ class _OrderPageState extends State<orderPage> {
                                                                           FontWeight
                                                                               .bold),
                                                                 ),
-                                                                order['Estimated time of arrival']!=''
-                                                                ?SizedBox(width: Dimensions.widht45,)
-                                                                :SizedBox.shrink(),
-                                                                 order['Estimated time of arrival']!=''
-                                                                ?Text(
-                                                                  'ETA: ',
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          Dimensions
-                                                                              .height15,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      color: const Color
-                                                                          .fromARGB(
-                                                                          255,
-                                                                          224,
-                                                                          58,
-                                                                          58)),
-                                                                )
-                                                                :SizedBox.shrink(),
+                                                                order['Estimated time of arrival'] !=
+                                                                        ''||order['Estimated time of arrival'] !=
+                                                                        null
+                                                                    ? SizedBox(
+                                                                        width: Dimensions
+                                                                            .widht45,
+                                                                      )
+                                                                    : SizedBox
+                                                                        .shrink(),
+                                                                order['Estimated time of arrival'] !=
+                                                                        ''||order['Estimated time of arrival'] !=
+                                                                        null
+                                                                    ? Text(
+                                                                        'ETA: ',
+                                                                        style: TextStyle(
+                                                                            fontSize: Dimensions
+                                                                                .height15,
+                                                                            fontWeight: FontWeight
+                                                                                .bold,
+                                                                            color: const Color.fromARGB(
+                                                                                255,
+                                                                                224,
+                                                                                58,
+                                                                                58)),
+                                                                      )
+                                                                    : SizedBox
+                                                                        .shrink(),
                                                                 Text(
                                                                   order['Estimated time of arrival'] ??
                                                                       '',
@@ -1032,13 +1093,20 @@ class _OrderPageState extends State<orderPage> {
                                                                     'Car Maintenance'
                                                                 ? SizedBox(
                                                                     height: Dimensions
-                                                                        .height12,
+                                                                        .height25,
                                                                   )
                                                                 : SizedBox(
                                                                     height: Dimensions
                                                                         .height30,
                                                                   ),
-                                                            order['Service'] =='Garage' ||order['Service'] =='Bellia Mart' || order['Service'] == 'car wash: your Place'
+                                                            order['Service'] ==
+                                                                        'Garage' ||
+                                                                    order['Service'] ==
+                                                                        'Bellia Mart' ||
+                                                                    order['Service'] ==
+                                                                        'car wash: your Place' ||
+                                                                    order['Service'] ==
+                                                                        'car wash: our center'
                                                                 ? Row(
                                                                     mainAxisAlignment:
                                                                         MainAxisAlignment
@@ -1137,29 +1205,29 @@ class _OrderPageState extends State<orderPage> {
                                                                                                 ))
                                                                                           ],
                                                                                         ),
-                                                                                         order['Status']=='Confirmed'
-                                                                                        ?SizedBox(
-                                                                                          height: Dimensions.height10,
-                                                                                        )
-                                                                                        :SizedBox.shrink(),
-                                                                                        order['Status']=='Confirmed'
-                                                                                        ?Row(
-                                                                                          //mainAxisAlignment: MainAxisAlignment.end,
-                                                                                          children: [
-                                                                                            // Icon(Icons.add, color: const Color.fromARGB(255, 224, 58, 58)),
-                                                                                            SizedBox(width: Dimensions.widht30),
-                                                                                            ElevatedButton(
-                                                                                                style: ElevatedButton.styleFrom(backgroundColor: Color.fromARGB(255, 0, 0, 0)),
-                                                                                                onPressed: () {
-                                                                                                  _pay(int.parse(order['Total Service cost']));
-                                                                                                },
-                                                                                                child: Text(
-                                                                                                  "Proceed to payment",
-                                                                                                  style: TextStyle(fontSize: Dimensions.height14, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 255, 254, 254)),
-                                                                                                ))
-                                                                                          ],
-                                                                                        )
-                                                                                        :SizedBox.shrink(),
+                                                                                        order['Status'] == 'Confirmed'
+                                                                                            ? SizedBox(
+                                                                                                height: Dimensions.height10,
+                                                                                              )
+                                                                                            : SizedBox.shrink(),
+                                                                                        order['Status'] == 'Confirmed'
+                                                                                            ? Row(
+                                                                                                //mainAxisAlignment: MainAxisAlignment.end,
+                                                                                                children: [
+                                                                                                  // Icon(Icons.add, color: const Color.fromARGB(255, 224, 58, 58)),
+                                                                                                  SizedBox(width: Dimensions.widht30),
+                                                                                                  ElevatedButton(
+                                                                                                      style: ElevatedButton.styleFrom(backgroundColor: Color.fromARGB(255, 0, 0, 0)),
+                                                                                                      onPressed: () {
+                                                                                                        _pay(int.parse(order['Total Service cost']));
+                                                                                                      },
+                                                                                                      child: Text(
+                                                                                                        "Proceed to payment",
+                                                                                                        style: TextStyle(fontSize: Dimensions.height14, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 255, 254, 254)),
+                                                                                                      ))
+                                                                                                ],
+                                                                                              )
+                                                                                            : SizedBox.shrink(),
                                                                                       ],
                                                                                     ),
                                                                                     actions: [
@@ -1250,29 +1318,29 @@ class _OrderPageState extends State<orderPage> {
                                                                                             ),
                                                                                           ],
                                                                                         ),
-                                                                                        order['Status']=='Confirmed'
-                                                                                        ?SizedBox(
-                                                                                          height: Dimensions.height10,
-                                                                                        )
-                                                                                        :SizedBox.shrink(),
-                                                                                        order['Status']=='Confirmed'
-                                                                                        ?Row(
-                                                                                          //mainAxisAlignment: MainAxisAlignment.end,
-                                                                                          children: [
-                                                                                            // Icon(Icons.add, color: const Color.fromARGB(255, 224, 58, 58)),
-                                                                                            SizedBox(width: Dimensions.widht30),
-                                                                                            ElevatedButton(
-                                                                                                style: ElevatedButton.styleFrom(backgroundColor: Color.fromARGB(255, 0, 0, 0)),
-                                                                                                onPressed: () {
-                                                                                                  _pay(int.parse(order['Total Service cost']));
-                                                                                                },
-                                                                                                child: Text(
-                                                                                                  "Proceed to payment",
-                                                                                                  style: TextStyle(fontSize: Dimensions.height14, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 255, 254, 254)),
-                                                                                                ))
-                                                                                          ],
-                                                                                        )
-                                                                                        :SizedBox.shrink(),
+                                                                                        order['Status'] == 'Confirmed'
+                                                                                            ? SizedBox(
+                                                                                                height: Dimensions.height10,
+                                                                                              )
+                                                                                            : SizedBox.shrink(),
+                                                                                        order['Status'] == 'Confirmed'
+                                                                                            ? Row(
+                                                                                                //mainAxisAlignment: MainAxisAlignment.end,
+                                                                                                children: [
+                                                                                                  // Icon(Icons.add, color: const Color.fromARGB(255, 224, 58, 58)),
+                                                                                                  SizedBox(width: Dimensions.widht30),
+                                                                                                  ElevatedButton(
+                                                                                                      style: ElevatedButton.styleFrom(backgroundColor: Color.fromARGB(255, 0, 0, 0)),
+                                                                                                      onPressed: () {
+                                                                                                        _pay(int.parse(order['Total Service cost']));
+                                                                                                      },
+                                                                                                      child: Text(
+                                                                                                        "Proceed to payment",
+                                                                                                        style: TextStyle(fontSize: Dimensions.height14, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 255, 254, 254)),
+                                                                                                      ))
+                                                                                                ],
+                                                                                              )
+                                                                                            : SizedBox.shrink(),
                                                                                       ],
                                                                                     ),
                                                                                     actions: [
@@ -1287,9 +1355,8 @@ class _OrderPageState extends State<orderPage> {
                                                                                       ),
                                                                                     ],
                                                                                   );
-                                                                                } 
-                                                                                else if(order['Service'] == 'car wash: your Place'){
-                                                                                   return AlertDialog(
+                                                                                } else if (order['Service'] == 'car wash: your Place' || order['Service'] == 'car wash: our center') {
+                                                                                  return AlertDialog(
                                                                                     title: Container(
                                                                                         width: 10,
                                                                                         padding: EdgeInsets.all(5),
@@ -1313,7 +1380,7 @@ class _OrderPageState extends State<orderPage> {
                                                                                             SizedBox(
                                                                                               width: Dimensions.widht5,
                                                                                             ),
-                                                                                            Text('Package Name: ${order['package_title']}', style: TextStyle(fontSize: Dimensions.height13,fontWeight: FontWeight.bold)),
+                                                                                            Text('Package Name: ${order['package_title']}', style: TextStyle(fontSize: Dimensions.height13, fontWeight: FontWeight.bold)),
                                                                                           ],
                                                                                         ),
                                                                                         SizedBox(
@@ -1325,7 +1392,7 @@ class _OrderPageState extends State<orderPage> {
                                                                                             SizedBox(
                                                                                               width: Dimensions.widht5,
                                                                                             ),
-                                                                                            Text('Package Price: ${order['package_price']}', style: TextStyle(fontSize: Dimensions.height13,fontWeight: FontWeight.bold)),
+                                                                                            Text('Package Price: ${order['package_price']}', style: TextStyle(fontSize: Dimensions.height13, fontWeight: FontWeight.bold)),
                                                                                           ],
                                                                                         ),
                                                                                         SizedBox(
@@ -1339,29 +1406,29 @@ class _OrderPageState extends State<orderPage> {
                                                                                             Text('Total Price: ${order['package_price']} LE', style: TextStyle(fontSize: Dimensions.height17, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 224, 58, 58))),
                                                                                           ],
                                                                                         ),
-                                                                                         order['Status']=='Confirmed'
-                                                                                        ?SizedBox(
-                                                                                          height: Dimensions.height10,
-                                                                                        )
-                                                                                        :SizedBox.shrink(),
-                                                                                        order['Status']=='Confirmed'
-                                                                                        ?Row(
-                                                                                          //mainAxisAlignment: MainAxisAlignment.end,
-                                                                                          children: [
-                                                                                            // Icon(Icons.add, color: const Color.fromARGB(255, 224, 58, 58)),
-                                                                                            SizedBox(width: Dimensions.widht45),
-                                                                                            ElevatedButton(
-                                                                                                style: ElevatedButton.styleFrom(backgroundColor: Color.fromARGB(255, 0, 0, 0)),
-                                                                                                onPressed: () {
-                                                                                                  _pay(int.parse(order['package_price']));
-                                                                                                },
-                                                                                                child: Text(
-                                                                                                  "Proceed to payment",
-                                                                                                  style: TextStyle(fontSize: Dimensions.height14, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 255, 254, 254)),
-                                                                                                ))
-                                                                                          ],
-                                                                                        )
-                                                                                        :SizedBox.shrink(),
+                                                                                        order['Status'] == 'Confirmed'
+                                                                                            ? SizedBox(
+                                                                                                height: Dimensions.height10,
+                                                                                              )
+                                                                                            : SizedBox.shrink(),
+                                                                                        order['Status'] == 'Confirmed'
+                                                                                            ? Row(
+                                                                                                //mainAxisAlignment: MainAxisAlignment.end,
+                                                                                                children: [
+                                                                                                  // Icon(Icons.add, color: const Color.fromARGB(255, 224, 58, 58)),
+                                                                                                  SizedBox(width: Dimensions.widht39),
+                                                                                                  ElevatedButton(
+                                                                                                      style: ElevatedButton.styleFrom(backgroundColor: Color.fromARGB(255, 0, 0, 0)),
+                                                                                                      onPressed: () {
+                                                                                                        _pay(int.parse(order['package_price']));
+                                                                                                      },
+                                                                                                      child: Text(
+                                                                                                        "Proceed to payment",
+                                                                                                        style: TextStyle(fontSize: Dimensions.height14, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 255, 254, 254)),
+                                                                                                      ))
+                                                                                                ],
+                                                                                              )
+                                                                                            : SizedBox.shrink(),
                                                                                       ],
                                                                                     ),
                                                                                     actions: [
@@ -1376,8 +1443,7 @@ class _OrderPageState extends State<orderPage> {
                                                                                       ),
                                                                                     ],
                                                                                   );
-                                                                                }
-                                                                                else {
+                                                                                } else {
                                                                                   return AlertDialog(
                                                                                     title: Text('Unknown Service'),
                                                                                     content: Text('Details about the service are not available.'),
